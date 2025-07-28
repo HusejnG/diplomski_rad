@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Izmeni Ponudu #') }}{{ $proposal->id }}
+            {{ __('Izmijeni ponudu #') }}{{ $proposal->id }}
         </h2>
     </x-slot>
 
@@ -16,7 +16,7 @@
 
                         @include('proposals._form', ['proposal' => $proposal, 'products' => $products, 'selectedProducts' => $selectedProducts])
 
-                        <button type="submit" class="btn btn-primary">Ažuriraj Ponudu</button>
+                        <button type="submit" class="btn btn-primary">Ažuriraj ponudu</button>
                         <a href="{{ route('proposals.show', $proposal) }}" class="btn btn-secondary">Odustani</a>
                     </form>
                 </div>

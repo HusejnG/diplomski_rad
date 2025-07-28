@@ -1,20 +1,18 @@
-{{-- resources/views/products/_form.blade.php --}}
-
 <div class="mb-3">
-    <label for="name" class="form-label">Naziv Proizvoda</label>
+    <label for="name" class="form-label">Naziv proizvoda</label>
     <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $product->name ?? '') }}" required>
     @error('name')
         <div class="text-danger">{{ $message }}</div>
     @enderror
 </div>
 <div class="mb-3">
-    <label for="type" class="form-label">Tip Proizvoda</label>
+    <label for="type" class="form-label">Tip proizvoda</label>
     <select class="form-select" id="type" name="type">
         <option value="">Odaberi tip</option>
         <option value="panel" {{ old('type', $product->type ?? '') == 'panel' ? 'selected' : '' }}>Solarni Panel</option>
         <option value="inverter" {{ old('type', $product->type ?? '') == 'inverter' ? 'selected' : '' }}>Inverter</option>
         <option value="battery" {{ old('type', $product->type ?? '') == 'battery' ? 'selected' : '' }}>Baterija</option>
-        <option value="cable" {{ old('type', $product->type ?? '') == 'cable' ? 'selected' : '' }}>Kabel</option>
+        <option value="cable" {{ old('type', $product->type ?? '') == 'cable' ? 'selected' : '' }}>Kabl</option>
         <option value="construction" {{ old('type', $product->type ?? '') == 'construction' ? 'selected' : '' }}>Konstrukcija</option>
         <option value="other" {{ old('type', $product->type ?? '') == 'other' ? 'selected' : '' }}>Ostalo</option>
     </select>
@@ -37,7 +35,7 @@
     @enderror
 </div>
 <div class="mb-3">
-    <label for="price" class="form-label">Cena</label>
+    <label for="price" class="form-label">Cijena</label>
     <input type="number" step="0.01" class="form-control" id="price" name="price" value="{{ old('price', $product->price ?? '') }}">
     @error('price')
         <div class="text-danger">{{ $message }}</div>
@@ -86,7 +84,7 @@
     @enderror
 </div>
 <div class="mb-3">
-    <label for="image" class="form-label">Slika Proizvoda</label>
+    <label for="image" class="form-label">Slika proizvoda</label>
     <input type="file" class="form-control" id="image" name="image" accept="image/*">
     @error('image')
         <div class="text-danger">{{ $message }}</div>

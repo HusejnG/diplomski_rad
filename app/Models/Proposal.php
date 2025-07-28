@@ -19,19 +19,16 @@ class Proposal extends Model
         'status',
     ];
 
-    // Relacija sa zahtevom za ponudu
     public function quoteRequest()
     {
         return $this->belongsTo(QuoteRequest::class);
     }
 
-    // Relacija sa projektantom koji je kreirao ponudu
     public function designer()
     {
         return $this->belongsTo(User::class, 'designer_id');
     }
 
-    // Relacija sa proizvodima (many-to-many)
     public function products()
     {
         return $this->belongsToMany(Product::class, 'proposal_product')

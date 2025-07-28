@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Zahtevi za Ponudu') }} {{-- Promenjeno iz "Moji Zahtevi za Ponudu" u "Zahtevi za Ponudu" --}}
+            {{ __('Zahtevi za Ponudu') }}
         </h2>
     </x-slot>
 
@@ -9,7 +9,6 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    {{-- Dugme za kreiranje zahteva je uvek tu za kupce --}}
                     <a href="{{ route('quote-requests.create') }}" class="btn btn-primary mb-3">Pošalji novi zahtev za ponudu</a>
 
                     @if (session('success'))
@@ -48,17 +47,14 @@
                                         <td><span class="badge bg-{{ $request->status === 'pending' ? 'warning' : ($request->status === 'in_progress' ? 'info' : ($request->status === 'completed' ? 'success' : 'danger')) }}">{{ ucfirst($request->status) }}</span></td>
                                         <td>{{ $request->created_at->format('d.m.Y H:i') }}</td>
                                         <td>
-                                            {{-- Svi mogu pregledati svoj zahtev --}}
                                             <a href="{{ route('quote-requests.show', $request) }}" class="btn btn-info btn-sm">Pregledaj</a>
-                                            {{-- Samo vlasnik i dok je pending može menjati/brisati --}}
-                                            @if (Auth::id() === $request->user_id && $request->status === 'pending')
-                                                <a href="{{ route('quote-requests.edit', $request) }}" class="btn btn-warning btn-sm">Izmeni</a>
-                                                <form action="{{ route('quote-requests.destroy', $request) }}" method="POST" style="display:inline-block;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Da li ste sigurni da želite da obrišete ovaj zahtev?')">Obriši</button>
-                                                </form>
-                                            @endif
+                                            {{-- Uklonjen uslov za prikaz Izmeni/Obriši dugmadi --}}
+                                            <a href="{{ route('quote-requests.edit', $request) }}" class="btn btn-warning btn-sm">Izmeni</a>
+                                            <form action="{{ route('quote-requests.destroy', $request) }}" method="POST" style="display:inline-block;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Da li ste sigurni da želite da obrišete ovaj zahtev?')">Obriši</button>
+                                            </form>
                                         </td>
                                     </tr>
                                 @endforeach

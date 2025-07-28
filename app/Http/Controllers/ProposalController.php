@@ -7,65 +7,36 @@ use App\Models\QuoteRequest;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
+// use Illuminate\Support\Facades\Gate; 
 
 class ProposalController extends Controller
 {
     public function __construct()
     {
-        // Samo projektanti i admini mogu upravljati ponudama
-        $this->middleware('can:manage-proposals')->except(['index', 'show']);
-        // Index i show imaju posebne Gate provere
+        // $this->middleware('can:manage-proposals')->except(['index', 'show']);
     }
 
-    /**
-     * Prikaz svih ponuda (za projektante i admine).
-     */
     public function index()
     {
-        if (Auth::user()->isAdmin()) {
-            $proposals = Proposal::latest()->get();
-        } elseif (Auth::user()->isDesigner()) {
-            $proposals = Auth::user()->createdProposals()->latest()->get();
-        } else {
-            // Za kupce, prikazuje ponude vezane za njihove zahteve
-            $proposals = Auth::user()->receivedProposals()->latest()->get();
-        }
-
+        $proposals = Proposal::latest()->get();
         return view('proposals.index', compact('proposals'));
     }
 
-    /**
-     * Prikaz forme za kreiranje nove ponude za specifičan zahtev.
-     */
     public function create(Request $request)
     {
-        Gate::authorize('create-proposal'); // Samo projektanti mogu kreirati
-
         $quoteRequestId = $request->query('quote_request_id');
         $quoteRequest = null;
 
         if ($quoteRequestId) {
             $quoteRequest = QuoteRequest::findOrFail($quoteRequestId);
-            // Provera da li projektant ima pravo da kreira ponudu za ovaj zahtev
-            // (npr. da zahtev nije već obrađen ili dodeljen drugom projektantu)
-            // Za sada, dozvoljavamo ako je status 'pending'
-            if ($quoteRequest->status !== 'pending') {
-                return redirect()->route('quote-requests.show', $quoteRequest)->with('error', 'Ponuda za ovaj zahtev je već u obradi ili završena.');
-            }
         }
 
-        $products = Product::all(); // Svi dostupni proizvodi
+        $products = Product::all(); 
         return view('proposals.create', compact('quoteRequest', 'products'));
     }
 
-    /**
-     * Skladištenje nove ponude u bazi.
-     */
     public function store(Request $request)
     {
-        Gate::authorize('create-proposal');
-
         $validatedData = $request->validate([
             'quote_request_id' => 'required|exists:quote_requests,id',
             'title' => 'required|string|max:255',
@@ -78,13 +49,12 @@ class ProposalController extends Controller
 
         $quoteRequest = QuoteRequest::findOrFail($validatedData['quote_request_id']);
 
-        // Kreiraj ponudu
         $proposal = Proposal::create([
             'quote_request_id' => $quoteRequest->id,
             'designer_id' => Auth::id(),
             'title' => $validatedData['title'],
             'description' => $validatedData['description'],
-            'status' => 'sent', // Postavi status na 'sent' kada je kreirana
+            'status' => 'sent', 
         ]);
 
         $totalPrice = 0;
@@ -97,7 +67,7 @@ class ProposalController extends Controller
             if ($product && $quantity > 0) {
                 $syncData[$productId] = [
                     'quantity' => $quantity,
-                    'price_at_time_of_proposal' => $product->price, // Sačuvaj trenutnu cenu
+                    'price_at_time_of_proposal' => $product->price,
                 ];
                 $totalPrice += ($product->price * $quantity);
             }
@@ -106,42 +76,28 @@ class ProposalController extends Controller
         $proposal->products()->sync($syncData);
         $proposal->update(['total_price' => $totalPrice]);
 
-        // Ažuriraj status zahteva za ponudu
-        $quoteRequest->update(['status' => 'in_progress']); // Ili 'completed' ako je ponuda odmah finalna
+        $quoteRequest->update(['status' => 'in_progress']);
 
-        return redirect()->route('proposals.show', $proposal)->with('success', 'Ponuda uspešno kreirana!');
+        return redirect()->route('proposals.show', $proposal)->with('success', 'Ponuda uspješno kreirana!');
     }
 
-    /**
-     * Prikaz specifične ponude.
-     */
     public function show(Proposal $proposal)
     {
-        Gate::authorize('view-proposal', $proposal); // Provera pristupa
-
         return view('proposals.show', compact('proposal'));
     }
 
-    /**
-     * Prikaz forme za editovanje ponude.
-     */
+   
     public function edit(Proposal $proposal)
     {
-        Gate::authorize('manage-proposals', $proposal); // Provera pristupa
-
-        $products = Product::all(); // Svi dostupni proizvodi
-        $selectedProducts = $proposal->products->pluck('pivot.quantity', 'id')->toArray(); // Količine odabranih proizvoda
+        $products = Product::all();
+        $selectedProducts = $proposal->products->pluck('pivot.quantity', 'id')->toArray();
 
         return view('proposals.edit', compact('proposal', 'products', 'selectedProducts'));
     }
 
-    /**
-     * Ažuriranje ponude u bazi.
-     */
+    
     public function update(Request $request, Proposal $proposal)
     {
-        Gate::authorize('manage-proposals', $proposal); // Provera pristupa
-
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -149,7 +105,7 @@ class ProposalController extends Controller
             'product_ids.*' => 'exists:products,id',
             'quantities' => 'required|array',
             'quantities.*' => 'required|integer|min:1',
-            'status' => 'required|in:draft,sent,accepted,rejected', // Projektant može menjati status
+            'status' => 'required|in:draft,sent,accepted,rejected',
         ]);
 
         $totalPrice = 0;
@@ -162,7 +118,7 @@ class ProposalController extends Controller
             if ($product && $quantity > 0) {
                 $syncData[$productId] = [
                     'quantity' => $quantity,
-                    'price_at_time_of_proposal' => $product->price, // Sačuvaj trenutnu cenu
+                    'price_at_time_of_proposal' => $product->price,
                 ];
                 $totalPrice += ($product->price * $quantity);
             }
@@ -171,28 +127,43 @@ class ProposalController extends Controller
         $proposal->update(array_merge($validatedData, ['total_price' => $totalPrice]));
         $proposal->products()->sync($syncData);
 
-        // Ažuriraj status zahteva za ponudu ako je ponuda završena
         if ($proposal->status === 'accepted' || $proposal->status === 'rejected') {
              $proposal->quoteRequest->update(['status' => $proposal->status]);
         } else {
              $proposal->quoteRequest->update(['status' => 'in_progress']);
         }
 
-
-        return redirect()->route('proposals.show', $proposal)->with('success', 'Ponuda uspešno ažurirana!');
+        return redirect()->route('proposals.show', $proposal)->with('success', 'Ponuda uspješno ažurirana!');
     }
 
-    /**
-     * Brisanje ponude.
-     */
+    
     public function destroy(Proposal $proposal)
     {
-        Gate::authorize('manage-proposals', $proposal); // Provera pristupa
-
-        // Razmisli o tome šta se dešava sa statusom QuoteRequest-a kada se ponuda obriše
-        // Možda ga vratiti na 'pending' ili 'rejected'
         $proposal->delete();
+        return redirect()->route('proposals.index')->with('success', 'Ponuda uspješno obrisana!');
+    }
 
-        return redirect()->route('proposals.index')->with('success', 'Ponuda uspešno obrisana!');
+    public function accept(Proposal $proposal)
+    {
+        if (Auth::id() !== $proposal->quoteRequest->user_id || $proposal->status !== 'sent') {
+            return redirect()->back()->with('error', 'Niste ovlašteni za ovu akciju ili ponuda nije u statusu za prihvatanje.');
+        }
+
+        $proposal->update(['status' => 'accepted']);
+        $proposal->quoteRequest->update(['status' => 'completed']); 
+
+        return redirect()->route('proposals.show', $proposal)->with('success', 'Ponuda je uspješno prihvaćena!');
+    }
+
+    public function reject(Proposal $proposal)
+    {
+        if (Auth::id() !== $proposal->quoteRequest->user_id || $proposal->status !== 'sent') {
+            return redirect()->back()->with('error', 'Niste ovlašteni za ovu akciju ili ponuda nije u statusu za odbijanje.');
+        }
+
+        $proposal->update(['status' => 'rejected']);
+        $proposal->quoteRequest->update(['status' => 'rejected']);
+
+        return redirect()->route('proposals.show', $proposal)->with('success', 'Ponuda je uspješno odbijena!');
     }
 }

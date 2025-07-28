@@ -58,13 +58,14 @@
                             <a href="{{ route('quote-requests.edit', $quoteRequest) }}" class="btn btn-warning">Izmeni Zahtev</a>
                         @endif
 
-                        @can('create-proposal') {{-- Samo projektant može da kreira ponudu --}}
-                            @if (!$proposal) {{-- Ako ponuda još ne postoji --}}
-                                <a href="{{ route('proposals.create', ['quote_request_id' => $quoteRequest->id]) }}" class="btn btn-success ms-2">Kreiraj Ponudu</a>
-                            @else
-                                <p class="mt-3 alert alert-info">Ponuda za ovaj zahtev je već kreirana: <a href="{{ route('proposals.show', $proposal) }}">#{{ $proposal->id }}</a></p>
-                            @endif
-                        @endcan
+                        {{-- Dugme za kreiranje ponude ili dugme za pregled postojeće ponude --}}
+                        @if (!$proposal) {{-- Ako ponuda još ne postoji --}}
+                            <a href="{{ route('proposals.create', ['quote_request_id' => $quoteRequest->id]) }}" class="btn btn-success ms-2">Kreiraj Ponudu</a>
+                        @else
+                            {{-- <<<<<<<<<<<<<<< IZMENJENO: Sada je dugme umesto paragrafa >>>>>>>>>>>>>>> --}}
+                            <a href="{{ route('proposals.show', $proposal) }}" class="btn btn-info ms-2">Pogledaj Ponudu #{{ $proposal->id }}</a>
+                            {{-- <<<<<<<<<<<<<<< KRAJ IZMENE >>>>>>>>>>>>>>> --}}
+                        @endif
                     </div>
                 </div>
             </div>

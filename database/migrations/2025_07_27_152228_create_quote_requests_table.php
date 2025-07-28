@@ -13,26 +13,23 @@ return new class extends Migration
     {
         Schema::create('quote_requests', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Ko je poslao zahtev
-            $table->string('contact_name'); // Ime osobe koja traži ponudu
-            $table->string('contact_email'); // Email za kontakt
-            $table->string('contact_phone')->nullable(); // Telefon za kontakt
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); 
+            $table->string('contact_name'); 
+            $table->string('contact_email'); 
+            $table->string('contact_phone')->nullable(); 
 
-            // Lokacija
             $table->string('address');
             $table->string('city');
-            $table->string('country')->default('Bosnia and Herzegovina'); // Pretpostavljena država
-            $table->decimal('latitude', 10, 7)->nullable(); // Opciono, za buduću mapu
-            $table->decimal('longitude', 10, 7)->nullable(); // Opciono, za buduću mapu
+            $table->string('country')->default('Bosnia and Herzegovina'); 
+            $table->decimal('latitude', 10, 7)->nullable(); 
+            $table->decimal('longitude', 10, 7)->nullable(); 
 
-            // Informacije o objektu
-            $table->string('roof_type')->nullable(); // Npr. 'kosi', 'ravan', 'drugi'
-            $table->decimal('roof_area_sqm', 8, 2)->nullable(); // Površina krova u m²
-            $table->decimal('avg_monthly_consumption_kwh', 8, 2); // Prosečna mesečna potrošnja u kWh
-            $table->text('notes')->nullable(); // Dodatne napomene korisnika
+            $table->string('roof_type')->nullable();
+            $table->decimal('roof_area_sqm', 8, 2)->nullable(); 
+            $table->decimal('avg_monthly_consumption_kwh', 8, 2); 
+            $table->text('notes')->nullable(); 
 
-            // Status zahteva (za projektanta)
-            $table->string('status')->default('pending'); // 'pending', 'in_progress', 'completed', 'rejected'
+            $table->string('status')->default('pending'); 
 
             $table->timestamps();
         });

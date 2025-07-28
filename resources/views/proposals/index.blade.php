@@ -28,10 +28,10 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Naslov</th>
-                                    <th>Zahtev #</th>
+                                    <th>Zahtjev #</th>
                                     <th>Kupac</th>
                                     <th>Projektant</th>
-                                    <th>Ukupna Cena</th>
+                                    <th>Ukupna cijena</th>
                                     <th>Status</th>
                                     <th>Kreirano</th>
                                     <th>Akcije</th>
@@ -50,14 +50,13 @@
                                         <td>{{ $proposal->created_at->format('d.m.Y H:i') }}</td>
                                         <td>
                                             <a href="{{ route('proposals.show', $proposal) }}" class="btn btn-info btn-sm">Pregledaj</a>
-                                            @can('manage-proposals', $proposal)
-                                                <a href="{{ route('proposals.edit', $proposal) }}" class="btn btn-warning btn-sm">Izmeni</a>
-                                                <form action="{{ route('proposals.destroy', $proposal) }}" method="POST" style="display:inline-block;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Da li ste sigurni da želite da obrišete ovu ponudu?')">Obriši</button>
-                                                </form>
-                                            @endcan
+                                            {{-- Uklonjen @can('manage-proposals', $proposal) --}}
+                                            <a href="{{ route('proposals.edit', $proposal) }}" class="btn btn-warning btn-sm">Izmijni</a>
+                                            <form action="{{ route('proposals.destroy', $proposal) }}" method="POST" style="display:inline-block;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Da li ste sigurni da želite da obrišete ovu ponudu?')">Obriši</button>
+                                            </form>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -67,4 +66,5 @@
                 </div>
             </div>
         </div>
-    </x-app-layout>
+    </div>
+</x-app-layout>

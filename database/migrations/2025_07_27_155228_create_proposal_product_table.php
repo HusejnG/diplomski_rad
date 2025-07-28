@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('proposal_id')->constrained()->onDelete('cascade');
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->integer('quantity')->default(1); // Količina proizvoda u ponudi
-            $table->decimal('price_at_time_of_proposal', 10, 2)->nullable(); // Cena proizvoda u trenutku kreiranja ponude
+            $table->integer('quantity')->default(1); 
+            $table->decimal('price_at_time_of_proposal', 10, 2)->nullable();
             $table->timestamps();
         });
     }

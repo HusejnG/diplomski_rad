@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('proposals', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('quote_request_id')->constrained()->onDelete('cascade'); // Povezuje sa zahtevom
-            $table->foreignId('designer_id')->constrained('users')->onDelete('cascade'); // Ko je kreirao ponudu (projektant)
+            $table->foreignId('quote_request_id')->constrained()->onDelete('cascade'); 
+            $table->foreignId('designer_id')->constrained('users')->onDelete('cascade'); 
             $table->string('title');
             $table->text('description')->nullable();
             $table->decimal('total_price', 10, 2)->nullable();
             $table->string('currency')->default('EUR');
-            $table->string('status')->default('draft'); // 'draft', 'sent', 'accepted', 'rejected'
+            $table->string('status')->default('draft'); 
             $table->timestamps();
         });
     }

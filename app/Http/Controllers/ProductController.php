@@ -4,30 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage; // Za rad sa slikama
+use Illuminate\Support\Facades\Storage; 
 
 class ProductController extends Controller
 {
-    /**
-     * Prikaz svih proizvoda (za administraciju/CRUD).
-     */
     public function index()
     {
         $products = Product::latest()->get();
         return view('products.index', compact('products'));
     }
 
-    /**
-     * Prikaz forme za kreiranje novog proizvoda.
-     */
     public function create()
     {
         return view('products.create');
     }
 
-    /**
-     * Skladištenje novog proizvoda u bazi.
-     */
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -42,7 +33,7 @@ class ProductController extends Controller
             'length_mm' => 'nullable|numeric|min:0',
             'width_mm' => 'nullable|numeric|min:0',
             'height_mm' => 'nullable|numeric|min:0',
-            'image' => 'nullable|image|max:2048', // Max 2MB slika
+            'image' => 'nullable|image|max:2048', 
         ]);
 
         $imagePath = null;
@@ -52,28 +43,20 @@ class ProductController extends Controller
 
         Product::create(array_merge($validatedData, ['image_path' => $imagePath]));
 
-        return redirect()->route('products.index')->with('success', 'Proizvod uspešno dodan!');
+        return redirect()->route('products.index')->with('success', 'Proizvod uspješno dodan!');
     }
 
-    /**
-     * Prikaz specifičnog proizvoda.
-     */
+    
     public function show(Product $product)
     {
         return view('products.show', compact('product'));
     }
 
-    /**
-     * Prikaz forme za editovanje proizvoda.
-     */
     public function edit(Product $product)
     {
         return view('products.edit', compact('product'));
     }
 
-    /**
-     * Ažuriranje proizvoda u bazi.
-     */
     public function update(Request $request, Product $product)
     {
         $validatedData = $request->validate([
@@ -88,11 +71,10 @@ class ProductController extends Controller
             'length_mm' => 'nullable|numeric|min:0',
             'width_mm' => 'nullable|numeric|min:0',
             'height_mm' => 'nullable|numeric|min:0',
-            'image' => 'nullable|image|max:2048', // Max 2MB slika
+            'image' => 'nullable|image|max:2048', 
         ]);
 
         if ($request->hasFile('image')) {
-            // Obriši staru sliku ako postoji
             if ($product->image_path) {
                 Storage::disk('public')->delete($product->image_path);
             }
@@ -102,30 +84,23 @@ class ProductController extends Controller
 
         $product->update($validatedData);
 
-        return redirect()->route('products.index')->with('success', 'Proizvod uspešno ažuriran!');
+        return redirect()->route('products.index')->with('success', 'Proizvod uspješno ažuriran!');
     }
 
-    /**
-     * Brisanje proizvoda.
-     */
     public function destroy(Product $product)
     {
-        // Obriši sliku proizvoda
         if ($product->image_path) {
             Storage::disk('public')->delete($product->image_path);
         }
 
         $product->delete();
 
-        return redirect()->route('products.index')->with('success', 'Proizvod uspešno obrisan!');
+        return redirect()->route('products.index')->with('success', 'Proizvod uspješno obrisan!');
     }
 
-    /**
-     * Prikaz svih proizvoda za web shop.
-     */
     public function shopIndex()
     {
-        $products = Product::latest()->get(); // Možeš dodati paginaciju, filtere itd.
+        $products = Product::latest()->get();
         return view('shop.index', compact('products'));
     }
 }

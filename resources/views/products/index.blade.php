@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Upravljanje Proizvodima') }}
+            {{ __('Upravljanje proizvodima') }}
         </h2>
     </x-slot>
 
@@ -18,7 +18,7 @@
                     @endif
 
                     @if ($products->isEmpty())
-                        <p>Nema dodatih proizvoda.</p>
+                        <p>Nema dodanih proizvoda.</p>
                     @else
                         <table class="table table-striped">
                             <thead>
@@ -26,7 +26,7 @@
                                     <th>Slika</th>
                                     <th>Naziv</th>
                                     <th>Tip</th>
-                                    <th>Cena</th>
+                                    <th>Cijena</th>
                                     <th>Snaga (W)</th>
                                     <th>Akcije</th>
                                 </tr>
@@ -47,7 +47,7 @@
                                         <td>{{ $product->power_w ?? 'N/A' }}</td>
                                         <td>
                                             <a href="{{ route('products.show', $product) }}" class="btn btn-info btn-sm">Pregledaj</a>
-                                            <a href="{{ route('products.edit', $product) }}" class="btn btn-warning btn-sm">Izmeni</a>
+                                            <a href="{{ route('products.edit', $product) }}" class="btn btn-warning btn-sm">Izmijeni</a>
                                             <form action="{{ route('products.destroy', $product) }}" method="POST" style="display:inline-block;">
                                                 @csrf
                                                 @method('DELETE')

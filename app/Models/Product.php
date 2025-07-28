@@ -25,7 +25,6 @@ class Product extends Model
     ];
 
 
-    // Relacija sa ponudama (many-to-many)
     public function proposals()
     {
         return $this->belongsToMany(Proposal::class, 'proposal_product')

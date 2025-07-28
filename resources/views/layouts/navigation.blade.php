@@ -2,7 +2,6 @@
     <div class="container">
         <!-- Logo -->
         <a class="navbar-brand" href="{{ route('dashboard') }}">
-            {{-- Možeš ovde dodati sliku ili SVG logo ako želiš --}}
             {{ config('app.name', 'Solarni Sistem') }}
         </a>
 
@@ -20,25 +19,21 @@
                     </a>
                 </li>
                 @auth {{-- Ovi linkovi su dostupni samo prijavljenim korisnicima --}}
-                    @can('manage-products') {{-- Samo admin i projektant vide upravljanje proizvodima --}}
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}" href="{{ route('products.index') }}">
-                                {{ __('Proizvodi (Admin)') }}
-                            </a>
-                        </li>
-                    @endcan
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('quote-requests.*') ? 'active' : '' }}" href="{{ route('quote-requests.index') }}">
-                            {{ __('Zahtevi za Ponudu') }} {{-- Jedinstven naziv za sve uloge --}}
+                        <a class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}" href="{{ route('products.index') }}">
+                            {{ __('Proizvodi (Admin)') }}
                         </a>
                     </li>
-                    @can('manage-proposals') {{-- Samo admin i projektant vide upravljanje ponudama --}}
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('proposals.*') ? 'active' : '' }}" href="{{ route('proposals.index') }}">
-                                {{ __('Upravljanje Ponudama') }}
-                            </a>
-                        </li>
-                    @endcan
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('quote-requests.*') ? 'active' : '' }}" href="{{ route('quote-requests.index') }}">
+                            {{ __('Zahtjevi za Ponudu') }}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('proposals.*') ? 'active' : '' }}" href="{{ route('proposals.index') }}">
+                            {{ __('Upravljanje Ponudama') }}
+                        </a>
+                    </li>
                 @endauth
                 {{-- Shop link može biti vidljiv svima (i gostima) --}}
                 <li class="nav-item">
@@ -46,7 +41,11 @@
                         {{ __('Shop') }}
                     </a>
                 </li>
-                {{-- Dodaj ovde ostale navigacione linkove po potrebi --}}
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('pvgis.index') ? 'active' : '' }}" href="{{ route('pvgis.index') }}">
+                        {{ __('PVGIS Kalkulator') }}
+                    </a>
+                </li>
             </ul>
 
             <!-- Right Side Of Navbar (Auth Links / User Dropdown) -->

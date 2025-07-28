@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Izmeni Proizvod: ') }} {{ $product->name }}
+            {{ __('Izmijeni proizvod: ') }} {{ $product->name }}
         </h2>
     </x-slot>
 
@@ -12,8 +12,8 @@
                     <form action="{{ route('products.update', $product) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
-                        @include('products._form') {{-- Koristimo parcijal za formu --}}
-                        <button type="submit" class="btn btn-primary">Ažuriraj Proizvod</button>
+                        @include('products._form')
+                        <button type="submit" class="btn btn-primary">Ažuriraj proizvod</button>
                         <a href="{{ route('products.index') }}" class="btn btn-secondary">Odustani</a>
                     </form>
                 </div>

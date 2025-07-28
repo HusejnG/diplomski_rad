@@ -26,7 +26,6 @@ class QuoteRequest extends Model
         'status',
     ];
 
-    // Relacija sa korisnikom koji je poslao zahtev
     public function user()
     {
         return $this->belongsTo(User::class);

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Detalji Proizvoda: ') }} {{ $product->name }}
+            {{ __('Detalji proizvoda: ') }} {{ $product->name }}
         </h2>
     </x-slot>
 
@@ -31,7 +31,7 @@
                                 <dt class="col-sm-3">Model:</dt>
                                 <dd class="col-sm-9">{{ $product->model ?? 'N/A' }}</dd>
 
-                                <dt class="col-sm-3">Cena:</dt>
+                                <dt class="col-sm-3">Cijena:</dt>
                                 <dd class="col-sm-9">{{ $product->price ? $product->price . ' ' . $product->currency : 'N/A' }}</dd>
 
                                 <dt class="col-sm-3">Snaga:</dt>
@@ -51,14 +51,14 @@
                                 <dt class="col-sm-3">Opis:</dt>
                                 <dd class="col-sm-9">{{ $product->description ?? 'N/A' }}</dd>
 
-                                <dt class="col-sm-3">Dodato:</dt>
+                                <dt class="col-sm-3">Dodano:</dt>
                                 <dd class="col-sm-9">{{ $product->created_at->format('d.m.Y H:i') }}</dd>
                             </dl>
                         </div>
                     </div>
                     <div class="mt-4">
                         <a href="{{ route('products.index') }}" class="btn btn-secondary">Nazad na listu</a>
-                        <a href="{{ route('products.edit', $product) }}" class="btn btn-warning">Izmeni</a>
+                        <a href="{{ route('products.edit', $product) }}" class="btn btn-warning">Izmijeni</a>
                     </div>
                 </div>
             </div>

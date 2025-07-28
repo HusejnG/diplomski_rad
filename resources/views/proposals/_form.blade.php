@@ -1,26 +1,24 @@
-{{-- resources/views/proposals/_form.blade.php --}}
-
 <div class="mb-3">
-    <label for="title" class="form-label">Naslov Ponude</label>
+    <label for="title" class="form-label">Naslov ponude</label>
     <input type="text" class="form-control" id="title" name="title" value="{{ old('title', $proposal->title ?? 'Ponuda za solarni sistem') }}" required>
     @error('title')
         <div class="text-danger">{{ $message }}</div>
     @enderror
 </div>
 <div class="mb-3">
-    <label for="description" class="form-label">Opis Ponude (opciono)</label>
+    <label for="description" class="form-label">Opis ponude (opciono)</label>
     <textarea class="form-control" id="description" name="description" rows="3">{{ old('description', $proposal->description ?? '') }}</textarea>
     @error('description')
         <div class="text-danger">{{ $message }}</div>
     @enderror
 </div>
 
-@if(isset($proposal)) {{-- Status se menja samo kod izmene postojeće ponude --}}
+@if(isset($proposal)) 
 <div class="mb-3">
-    <label for="status" class="form-label">Status Ponude</label>
+    <label for="status" class="form-label">Status ponude</label>
     <select class="form-select" id="status" name="status">
         <option value="draft" {{ old('status', $proposal->status ?? '') == 'draft' ? 'selected' : '' }}>Nacrt</option>
-        <option value="sent" {{ old('status', $proposal->status ?? '') == 'sent' ? 'selected' : '' }}>Poslato</option>
+        <option value="sent" {{ old('status', $proposal->status ?? '') == 'sent' ? 'selected' : '' }}>Poslano</option>
         <option value="accepted" {{ old('status', $proposal->status ?? '') == 'accepted' ? 'selected' : '' }}>Prihvaćeno</option>
         <option value="rejected" {{ old('status', $proposal->status ?? '') == 'rejected' ? 'selected' : '' }}>Odbijeno</option>
     </select>
@@ -30,7 +28,7 @@
 </div>
 @endif
 
-<h4 class="mt-4">Odaberi Proizvode:</h4>
+<h4 class="mt-4">Odaberi proizvode:</h4>
 <div id="product-selection-container">
     @if(isset($selectedProducts) && !empty($selectedProducts))
         @foreach($selectedProducts as $productId => $quantity)
@@ -60,7 +58,6 @@
             @endif
         @endforeach
     @else
-        {{-- Inicijalni prazan red za dodavanje proizvoda --}}
         <div class="row mb-3 product-row">
             <div class="col-md-6">
                 <label for="product_id_0" class="form-label">Proizvod</label>
@@ -89,7 +86,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         const container = document.getElementById('product-selection-container');
         const addProductBtn = document.getElementById('add-product-row');
-        let productRowIndex = {{ isset($selectedProducts) && !empty($selectedProducts) ? count($selectedProducts) : 1 }}; // Počinjemo od 1 ako je već nešto dodato
+        let productRowIndex = {{ isset($selectedProducts) && !empty($selectedProducts) ? count($selectedProducts) : 1 }}; 
 
         addProductBtn.addEventListener('click', function () {
             const newRow = document.createElement('div');
@@ -118,10 +115,8 @@
             productRowIndex++;
         });
 
-        // Delegirano rukovanje događajima za uklanjanje redova
         container.addEventListener('click', function (e) {
             if (e.target.classList.contains('remove-product-row')) {
-                // Spreči uklanjanje poslednjeg reda
                 if (container.querySelectorAll('.product-row').length > 1) {
                     e.target.closest('.product-row').remove();
                 } else {
