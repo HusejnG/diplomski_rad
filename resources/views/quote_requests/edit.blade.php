@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Izmeni Zahtev za Ponudu #') }}{{ $quoteRequest->id }}
+            {{ __('Izmijeni zahtjev za ponudu #') }}{{ $quoteRequest->id }}
         </h2>
     </x-slot>
 
@@ -12,8 +12,8 @@
                     <form action="{{ route('quote-requests.update', $quoteRequest) }}" method="POST">
                         @csrf
                         @method('PUT')
-                        @include('quote_requests._form') {{-- Koristimo parcijal za formu --}}
-                        <button type="submit" class="btn btn-primary">Ažuriraj Zahtev</button>
+                        @include('quote_requests._form')
+                        <button type="submit" class="btn btn-primary">Ažuriraj zahtjev</button>
                         <a href="{{ route('quote-requests.index') }}" class="btn btn-secondary">Odustani</a>
                     </form>
                 </div>

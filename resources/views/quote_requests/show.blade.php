@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Detalji Zahteva za Ponudu #') }}{{ $quoteRequest->id }}
+            {{ __('Detalji zahtjeva za ponudu #') }}{{ $quoteRequest->id }}
         </h2>
     </x-slot>
 
@@ -16,13 +16,13 @@
                         <dt class="col-sm-4">Poslao:</dt>
                         <dd class="col-sm-8">{{ $quoteRequest->user->name }} ({{ $quoteRequest->user->email }})</dd>
 
-                        <dt class="col-sm-4">Kontakt Ime:</dt>
+                        <dt class="col-sm-4">Kontakt ime:</dt>
                         <dd class="col-sm-8">{{ $quoteRequest->contact_name }}</dd>
 
-                        <dt class="col-sm-4">Kontakt Email:</dt>
+                        <dt class="col-sm-4">Kontakt email:</dt>
                         <dd class="col-sm-8">{{ $quoteRequest->contact_email }}</dd>
 
-                        <dt class="col-sm-4">Kontakt Telefon:</dt>
+                        <dt class="col-sm-4">Kontakt telefon:</dt>
                         <dd class="col-sm-8">{{ $quoteRequest->contact_phone ?? 'N/A' }}</dd>
 
                         <dt class="col-sm-4">Adresa:</dt>
@@ -33,13 +33,13 @@
                             <dd class="col-sm-8">{{ $quoteRequest->latitude }}, {{ $quoteRequest->longitude }}</dd>
                         @endif
 
-                        <dt class="col-sm-4">Tip Krova:</dt>
+                        <dt class="col-sm-4">Tip krova:</dt>
                         <dd class="col-sm-8">{{ $quoteRequest->roof_type ?? 'N/A' }}</dd>
 
-                        <dt class="col-sm-4">Površina Krova (m²):</dt>
+                        <dt class="col-sm-4">Površina krova (m²):</dt>
                         <dd class="col-sm-8">{{ $quoteRequest->roof_area_sqm ?? 'N/A' }}</dd>
 
-                        <dt class="col-sm-4">Prosečna Mesečna Potrošnja (kWh):</dt>
+                        <dt class="col-sm-4">Prosječna mjesečna potrošnja (kWh):</dt>
                         <dd class="col-sm-8">{{ $quoteRequest->avg_monthly_consumption_kwh }} kWh</dd>
 
                         <dt class="col-sm-4">Napomene:</dt>
@@ -48,23 +48,20 @@
                         <dt class="col-sm-4">Kreirano:</dt>
                         <dd class="col-sm-8">{{ $quoteRequest->created_at->format('d.m.Y H:i') }}</dd>
 
-                        <dt class="col-sm-4">Poslednja izmena:</dt>
+                        <dt class="col-sm-4">Posljednja izmjena:</dt>
                         <dd class="col-sm-8">{{ $quoteRequest->updated_at->format('d.m.Y H:i') }}</dd>
                     </dl>
 
                     <div class="mt-4">
                         <a href="{{ route('quote-requests.index') }}" class="btn btn-secondary">Nazad na listu</a>
                         @if ($quoteRequest->status === 'pending')
-                            <a href="{{ route('quote-requests.edit', $quoteRequest) }}" class="btn btn-warning">Izmeni Zahtev</a>
+                            <a href="{{ route('quote-requests.edit', $quoteRequest) }}" class="btn btn-warning">Izmijeni zahtjev</a>
                         @endif
 
-                        {{-- Dugme za kreiranje ponude ili dugme za pregled postojeće ponude --}}
-                        @if (!$proposal) {{-- Ako ponuda još ne postoji --}}
-                            <a href="{{ route('proposals.create', ['quote_request_id' => $quoteRequest->id]) }}" class="btn btn-success ms-2">Kreiraj Ponudu</a>
+                        @if (!$proposal) 
+                            <a href="{{ route('proposals.create', ['quote_request_id' => $quoteRequest->id]) }}" class="btn btn-success ms-2">Kreiraj ponudu</a>
                         @else
-                            {{-- <<<<<<<<<<<<<<< IZMENJENO: Sada je dugme umesto paragrafa >>>>>>>>>>>>>>> --}}
-                            <a href="{{ route('proposals.show', $proposal) }}" class="btn btn-info ms-2">Pogledaj Ponudu #{{ $proposal->id }}</a>
-                            {{-- <<<<<<<<<<<<<<< KRAJ IZMENE >>>>>>>>>>>>>>> --}}
+                            <a href="{{ route('proposals.show', $proposal) }}" class="btn btn-info ms-2">Pogledaj ponudu #{{ $proposal->id }}</a>
                         @endif
                     </div>
                 </div>

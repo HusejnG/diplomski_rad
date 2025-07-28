@@ -2,7 +2,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Naši Proizvodi') }}
+            {{ __('Naši proizvodi') }}
         </h2>
     </x-slot>
 
@@ -25,11 +25,11 @@
                                         <div class="card-body">
                                             <h5 class="card-title">{{ $product->name }}</h5>
                                             <p class="card-text">
-                                                **Tip:** {{ ucfirst($product->type ?? 'N/A') }}<br>
-                                                **Proizvođač:** {{ $product->manufacturer ?? 'N/A' }}<br>
-                                                **Model:** {{ $product->model ?? 'N/A' }}<br>
-                                                **Snaga:** {{ $product->power_w ? $product->power_w . ' W' : 'N/A' }}<br>
-                                                **Cena:** {{ $product->price ? $product->price . ' ' . $product->currency : 'N/A' }}
+                                                Tip: {{ ucfirst($product->type ?? 'N/A') }}<br>
+                                                Proizvođač: {{ $product->manufacturer ?? 'N/A' }}<br>
+                                                Model: {{ $product->model ?? 'N/A' }}<br>
+                                                Snaga: {{ $product->power_w ? $product->power_w . ' W' : 'N/A' }}<br>
+                                                Cijena: {{ $product->price ? $product->price . ' ' . $product->currency : 'N/A' }}
                                             </p>
                                             <a href="{{ route('products.show', $product) }}" class="btn btn-primary">Detalji</a>
                                         </div>

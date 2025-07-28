@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Zahtevi za Ponudu') }}
+            {{ __('Zahtjevi za ponudu') }}
         </h2>
     </x-slot>
 
@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <a href="{{ route('quote-requests.create') }}" class="btn btn-primary mb-3">Pošalji novi zahtev za ponudu</a>
+                    <a href="{{ route('quote-requests.create') }}" class="btn btn-primary mb-3">Pošalji novi zahtjev za ponudu</a>
 
                     @if (session('success'))
                         <div class="alert alert-success">
@@ -23,7 +23,7 @@
                     @endif
 
                     @if ($quoteRequests->isEmpty())
-                        <p>Nema dostupnih zahteva za ponudu.</p>
+                        <p>Nema dostupnih zahtjeva za ponudu.</p>
                     @else
                         <table class="table table-striped">
                             <thead>
@@ -33,7 +33,7 @@
                                     <th>Grad</th>
                                     <th>Potrošnja (kWh/mesec)</th>
                                     <th>Status</th>
-                                    <th>Poslato</th>
+                                    <th>Poslano</th>
                                     <th>Akcije</th>
                                 </tr>
                             </thead>
@@ -48,8 +48,7 @@
                                         <td>{{ $request->created_at->format('d.m.Y H:i') }}</td>
                                         <td>
                                             <a href="{{ route('quote-requests.show', $request) }}" class="btn btn-info btn-sm">Pregledaj</a>
-                                            {{-- Uklonjen uslov za prikaz Izmeni/Obriši dugmadi --}}
-                                            <a href="{{ route('quote-requests.edit', $request) }}" class="btn btn-warning btn-sm">Izmeni</a>
+                                            <a href="{{ route('quote-requests.edit', $request) }}" class="btn btn-warning btn-sm">Izmijeni</a>
                                             <form action="{{ route('quote-requests.destroy', $request) }}" method="POST" style="display:inline-block;">
                                                 @csrf
                                                 @method('DELETE')

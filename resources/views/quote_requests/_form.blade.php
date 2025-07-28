@@ -1,28 +1,28 @@
 {{-- resources/views/quote_requests/_form.blade.php --}}
 
 <div class="mb-3">
-    <label for="contact_name" class="form-label">Vaše Ime i Prezime</label>
+    <label for="contact_name" class="form-label">Vaše ime i prezime</label>
     <input type="text" class="form-control" id="contact_name" name="contact_name" value="{{ old('contact_name', $quoteRequest->contact_name ?? Auth::user()->name) }}" required>
     @error('contact_name')
         <div class="text-danger">{{ $message }}</div>
     @enderror
 </div>
 <div class="mb-3">
-    <label for="contact_email" class="form-label">Vaš Email</label>
+    <label for="contact_email" class="form-label">Vaš email</label>
     <input type="email" class="form-control" id="contact_email" name="contact_email" value="{{ old('contact_email', $quoteRequest->contact_email ?? Auth::user()->email) }}" required>
     @error('contact_email')
         <div class="text-danger">{{ $message }}</div>
     @enderror
 </div>
 <div class="mb-3">
-    <label for="contact_phone" class="form-label">Vaš Telefon (opciono)</label>
+    <label for="contact_phone" class="form-label">Vaš telefon (opciono)</label>
     <input type="text" class="form-control" id="contact_phone" name="contact_phone" value="{{ old('contact_phone', $quoteRequest->contact_phone ?? '') }}">
     @error('contact_phone')
         <div class="text-danger">{{ $message }}</div>
     @enderror
 </div>
 <hr class="my-4">
-<h4>Informacije o Lokaciji i Potrošnji</h4>
+<h4>Informacije o lokaciji i potrošnji</h4>
 <div class="mb-3">
     <label for="address" class="form-label">Adresa</label>
     <input type="text" class="form-control" id="address" name="address" value="{{ old('address', $quoteRequest->address ?? '') }}" required>
@@ -44,7 +44,6 @@
         <div class="text-danger">{{ $message }}</div>
     @enderror
 </div>
-{{-- Latitude i Longitude za sada ostaju opcioni i ne prikazuju se u formi, ali su u bazi --}}
 {{-- <div class="mb-3">
     <label for="latitude" class="form-label">Latitude (opciono)</label>
     <input type="text" class="form-control" id="latitude" name="latitude" value="{{ old('latitude', $quoteRequest->latitude ?? '') }}">
@@ -60,7 +59,7 @@
     @enderror
 </div> --}}
 <div class="mb-3">
-    <label for="roof_type" class="form-label">Tip Krova (opciono)</label>
+    <label for="roof_type" class="form-label">Tip krova (opciono)</label>
     <select class="form-select" id="roof_type" name="roof_type">
         <option value="">Odaberi tip krova</option>
         <option value="kosi" {{ old('roof_type', $quoteRequest->roof_type ?? '') == 'kosi' ? 'selected' : '' }}>Kosi krov</option>
@@ -72,14 +71,14 @@
     @enderror
 </div>
 <div class="mb-3">
-    <label for="roof_area_sqm" class="form-label">Površina Krova (m²) (opciono)</label>
+    <label for="roof_area_sqm" class="form-label">Površina krova (m²) (opciono)</label>
     <input type="number" step="0.01" class="form-control" id="roof_area_sqm" name="roof_area_sqm" value="{{ old('roof_area_sqm', $quoteRequest->roof_area_sqm ?? '') }}">
     @error('roof_area_sqm')
         <div class="text-danger">{{ $message }}</div>
     @enderror
 </div>
 <div class="mb-3">
-    <label for="avg_monthly_consumption_kwh" class="form-label">Prosečna Mesečna Potrošnja Energije (kWh)</label>
+    <label for="avg_monthly_consumption_kwh" class="form-label">Prosječna mjesečna potrošnja energije (kWh)</label>
     <input type="number" step="0.01" class="form-control" id="avg_monthly_consumption_kwh" name="avg_monthly_consumption_kwh" value="{{ old('avg_monthly_consumption_kwh', $quoteRequest->avg_monthly_consumption_kwh ?? '') }}" required>
     @error('avg_monthly_consumption_kwh')
         <div class="text-danger">{{ $message }}</div>
