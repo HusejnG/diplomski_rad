@@ -7,6 +7,12 @@
 
     <!-- Bootstrap CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <!-- Leaflet CSS CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     crossorigin=""/> 
+
+    <!-- Custom CSS for consistency -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -41,12 +47,21 @@
         @keyframes spinner-border {
             to { transform: rotate(360deg); }
         }
+        /* Style for the map container */
+        #map {
+            height: 400px; 
+            width: 100%;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
     </style>
+    <!-- Fonts (Inter) -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
 </head>
 <body class="d-flex flex-column min-vh-100">
 
+    <!-- Navigation Header-->
     <header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
         <div class="container">
             <a class="navbar-brand" href="{{ url('/') }}">
@@ -90,18 +105,19 @@
                 <div class="col-md-8">
                     <div class="card p-4">
                         <h2 class="card-title text-center mb-4 fw-bold">PVGIS Kalkulator</h2>
-                        <p class="text-center text-muted mb-4">Unesite detalje za procjenu performansi solarnog sistema koristeći PVGIS API.</p>
+                        <p class="text-center text-muted mb-4">Unesite detalje ili odaberite lokaciju na mapi za procjenu performansi solarnog sistema.</p>
+
+                        <!-- Map Container -->
+                        <div id="map"></div>
 
                         <form id="pvgisForm" class="row g-3">
                             <div class="col-md-6">
                                 <label for="latitude" class="form-label">Geografska širina (Latitude)</label>
                                 <input type="number" step="0.0001" class="form-control" id="latitude" value="43.8563" required>
-                                <div class="form-text">Npr. 43.8563 (Sarajevo)</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="longitude" class="form-label">Geografska dužina (Longitude)</label>
                                 <input type="number" step="0.0001" class="form-control" id="longitude" value="18.4131" required>
-                                <div class="form-text">Npr. 18.4131 (Sarajevo)</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="peakPower" class="form-label">Instalirana snaga PV sistema (kWp)</label>
@@ -134,7 +150,6 @@
                                         </tr>
                                     </thead>
                                     <tbody id="resultsTableBody">
-                                        <!-- Results will be inserted here by JavaScript -->
                                     </tbody>
                                 </table>
                             </div>
@@ -159,8 +174,44 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     crossorigin=""></script> 
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const initialLat = 43.8563;
+            const initialLon = 18.4131;
+            
+            const map = L.map('map').setView([initialLat, initialLon], 13); 
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            const marker = L.marker([initialLat, initialLon], {
+                draggable: true
+            }).addTo(map);
+
+            function updateCoordinates(lat, lon) {
+                document.getElementById('latitude').value = lat.toFixed(4);
+                document.getElementById('longitude').value = lon.toFixed(4);
+            }
+
+            marker.on('dragend', function(e) {
+                const latlng = marker.getLatLng();
+                updateCoordinates(latlng.lat, latlng.lng);
+            });
+
+            map.on('click', function(e) {
+                marker.setLatLng(e.latlng);
+                updateCoordinates(e.latlng.lat, e.latlng.lng);
+            });
+
+            updateCoordinates(initialLat, initialLon);
+        });
+
+
         document.getElementById('pvgisForm').addEventListener('submit', async function(event) {
             event.preventDefault(); 
 
@@ -192,7 +243,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}' 
                     },
                     body: JSON.stringify({
                         latitude: latitude,
