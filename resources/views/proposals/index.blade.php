@@ -50,13 +50,18 @@
                                         <td>{{ $proposal->created_at->format('d.m.Y H:i') }}</td>
                                         <td>
                                             <a href="{{ route('proposals.show', $proposal) }}" class="btn btn-info btn-sm">Pregledaj</a>
-                                            {{-- Uklonjen @can('manage-proposals', $proposal) --}}
-                                            <a href="{{ route('proposals.edit', $proposal) }}" class="btn btn-warning btn-sm">Izmijni</a>
-                                            <form action="{{ route('proposals.destroy', $proposal) }}" method="POST" style="display:inline-block;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Da li ste sigurni da želite da obrišete ovu ponudu?')">Obriši</button>
-                                            </form>
+
+                                            {{-- Gumbi za akciju - vidljivi samo administratoru i dizajneru koji je kreirao ponudu --}}
+                                            @if(Auth::user()->isAdmin() || (Auth::user()->isDesigner() && Auth::user()->id === $proposal->designer_id))
+                                                @if ($proposal->status === 'sent')
+                                                    <a href="{{ route('proposals.edit', $proposal) }}" class="btn btn-warning btn-sm">Izmijeni</a>
+                                                @endif
+                                                <form action="{{ route('proposals.destroy', $proposal) }}" method="POST" style="display:inline-block;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Da li ste sigurni da želite da obrišete ovu ponudu?')">Obriši</button>
+                                                </form>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach

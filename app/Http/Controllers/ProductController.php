@@ -8,9 +8,36 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    public function index()
+    /**
+     * Prikazuje listu proizvoda s opcijama za pretraživanje i filtriranje.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\View\View
+     */
+    public function index(Request $request)
     {
-        $products = Product::latest()->get();
+        $query = Product::query();
+
+        if ($request->has('search') && $request->search != '') {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', "%$searchTerm%")
+                  ->orWhere('description', 'like', "%$searchTerm%")
+                  ->orWhere('model', 'like', "%$searchTerm%");
+            });
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->filled('manufacturer')) {
+            $manufacturerTerm = $request->manufacturer;
+            $query->where('manufacturer', 'like', "%$manufacturerTerm%");
+        }
+
+        $products = $query->latest()->get();
+
         return view('products.index', compact('products'));
     }
 
@@ -45,7 +72,6 @@ class ProductController extends Controller
 
         return redirect()->route('products.index')->with('success', 'Proizvod uspješno dodan!');
     }
-
     
     public function show(Product $product)
     {
@@ -98,9 +124,44 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'Proizvod uspješno obrisan!');
     }
 
-    public function shopIndex()
+    public function shopIndex(Request $request)
     {
-        $products = Product::latest()->get();
-        return view('shop.index', compact('products'));
+        // Dohvati sve jedinstvene tipove, uključujući one koji su NULL
+        $availableTypes = Product::distinct()->pluck('type')->sort()->values()->all();
+
+        // Ukloni prazne stringove, ali zadrži null
+        $availableTypes = array_filter($availableTypes, function($value) {
+            return !is_string($value) || strlen($value) > 0;
+        });
+
+        $query = Product::query();
+
+        if ($request->has('search') && $request->search != '') {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', "%$searchTerm%")
+                  ->orWhere('description', 'like', "%$searchTerm%")
+                  ->orWhere('model', 'like', "%$searchTerm%");
+            });
+        }
+        
+        // Ažurirani uvjet za filtriranje
+        if ($request->filled('type')) {
+            if ($request->type === 'null') {
+                $query->whereNull('type');
+            } else {
+                $query->where('type', $request->type);
+            }
+        }
+
+        if ($request->filled('manufacturer')) {
+            $manufacturerTerm = $request->manufacturer;
+            $query->where('manufacturer', 'like', "%$manufacturerTerm%");
+        }
+
+        $products = $query->latest()->get();
+
+        // Prosljeđivanje varijable s tipovima prikazu.
+        return view('shop.index', compact('products', 'availableTypes'));
     }
 }

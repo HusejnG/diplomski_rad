@@ -18,7 +18,30 @@ class ProposalController extends Controller
 
     public function index()
     {
-        $proposals = Proposal::latest()->get();
+        $user = Auth::user();
+
+        // Admin vidi sve ponude
+        if ($user->isAdmin()) {
+            $proposals = Proposal::with(['quoteRequest', 'designer'])->latest()->get();
+        }
+        // Dizajner vidi samo svoje ponude
+        else if ($user->isDesigner()) {
+            $proposals = Proposal::where('designer_id', $user->id)
+                                ->with(['quoteRequest', 'designer'])
+                                ->latest()
+                                ->get();
+        }
+        // Kupac vidi ponude koje su povezane s njegovim zahtjevima za ponudu
+        else if ($user->isCustomer()) {
+            $proposals = Proposal::whereHas('quoteRequest', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })->with(['quoteRequest', 'designer'])->latest()->get();
+        }
+        // Za ostale uloge, ne prikazuju se ponude
+        else {
+            $proposals = collect();
+        }
+
         return view('proposals.index', compact('proposals'));
     }
 
@@ -86,7 +109,7 @@ class ProposalController extends Controller
         return view('proposals.show', compact('proposal'));
     }
 
-   
+    
     public function edit(Proposal $proposal)
     {
         $products = Product::all();
@@ -105,7 +128,7 @@ class ProposalController extends Controller
             'product_ids.*' => 'exists:products,id',
             'quantities' => 'required|array',
             'quantities.*' => 'required|integer|min:1',
-            'status' => 'required|in:draft,sent,accepted,rejected',
+            // Uklonjen 'status' iz validacije
         ]);
 
         $totalPrice = 0;
@@ -124,9 +147,12 @@ class ProposalController extends Controller
             }
         }
 
+        // Ažurira se samo sadržaj, ne i status
         $proposal->update(array_merge($validatedData, ['total_price' => $totalPrice]));
         $proposal->products()->sync($syncData);
 
+        // Status zahtjeva se automatski ažurira samo ako ponuda bude prihvaćena ili odbijena,
+        // što se dešava preko accept() i reject() metoda, ne preko update() metode
         if ($proposal->status === 'accepted' || $proposal->status === 'rejected') {
              $proposal->quoteRequest->update(['status' => $proposal->status]);
         } else {
@@ -135,6 +161,7 @@ class ProposalController extends Controller
 
         return redirect()->route('proposals.show', $proposal)->with('success', 'Ponuda uspješno ažurirana!');
     }
+
 
     
     public function destroy(Proposal $proposal)

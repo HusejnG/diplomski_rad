@@ -14,7 +14,7 @@
                         @method('PUT')
                         @include('products._form')
                         <button type="submit" class="btn btn-primary">Ažuriraj proizvod</button>
-                        <a href="{{ route('products.index') }}" class="btn btn-secondary">Odustani</a>
+                        <a href="{{ route('shop.index') }}" class="btn btn-secondary">Odustani</a>
                     </form>
                 </div>
             </div>

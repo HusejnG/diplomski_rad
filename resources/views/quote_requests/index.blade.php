@@ -48,12 +48,23 @@
                                         <td>{{ $request->created_at->format('d.m.Y H:i') }}</td>
                                         <td>
                                             <a href="{{ route('quote-requests.show', $request) }}" class="btn btn-info btn-sm">Pregledaj</a>
-                                            <a href="{{ route('quote-requests.edit', $request) }}" class="btn btn-warning btn-sm">Izmijeni</a>
-                                            <form action="{{ route('quote-requests.destroy', $request) }}" method="POST" style="display:inline-block;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Da li ste sigurni da želite da obrišete ovaj zahtev?')">Obriši</button>
-                                            </form>
+                                            
+                                            {{-- Ako je korisnik projektant, prikaži dugme za kreiranje ponude samo ako ponuda ne postoji --}}
+                                            @if (Auth::user()->isDesigner() && !$request->proposal)
+                                                <a href="{{ route('proposals.create', ['quote_request_id' => $request->id]) }}" class="btn btn-success btn-sm">Kreiraj ponudu</a>
+                                            @endif
+                                            
+                                            {{-- Ako korisnik nije projektant, prikaži dugmad za izmjenu i brisanje --}}
+                                            @if (!Auth::user()->isDesigner())
+                                                @if ($request->status === 'pending')
+                                                    <a href="{{ route('quote-requests.edit', $request) }}" class="btn btn-warning btn-sm">Izmijeni</a>
+                                                @endif
+                                                <form action="{{ route('quote-requests.destroy', $request) }}" method="POST" style="display:inline-block;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Da li ste sigurni da želite da obrišete ovaj zahtev?')">Obriši</button>
+                                                </form>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach

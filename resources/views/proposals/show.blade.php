@@ -62,14 +62,19 @@
 
                     <div class="mt-4">
                         <a href="{{ route('proposals.index') }}" class="btn btn-secondary">Nazad na listu ponuda</a>
-                        <a href="{{ route('proposals.edit', $proposal) }}" class="btn btn-warning ms-2">Izmijeni ponudu</a>
-                        <form action="{{ route('proposals.destroy', $proposal) }}" method="POST" style="display:inline-block;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger ms-2" onclick="return confirm('Da li ste sigurni da želite da obrišete ovu ponudu?')">Obriši</button>
-                        </form>
 
                         @auth
+                            {{-- Dugmad za izmjenu i brisanje - vidljiva samo dizajneru koji je kreirao ponudu --}}
+                            @if (Auth::user()->isDesigner() && Auth::id() === $proposal->user_id && $proposal->status === 'sent')
+                                <a href="{{ route('proposals.edit', $proposal) }}" class="btn btn-warning ms-2">Izmijeni</a>
+                                <form action="{{ route('proposals.destroy', $proposal) }}" method="POST" style="display:inline-block;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger ms-2" onclick="return confirm('Da li ste sigurni da želite da obrišete ovu ponudu?')">Obriši</button>
+                                </form>
+                            @endif
+
+                            {{-- Dugmad za prihvatanje i odbijanje - vidljiva samo klijentu --}}
                             @if (Auth::id() === $proposal->quoteRequest->user_id && $proposal->status === 'sent')
                                 <hr class="my-4">
                                 <h5 class="mb-3">Akcije za ponudu:</h5>

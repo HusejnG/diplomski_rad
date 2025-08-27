@@ -13,21 +13,6 @@
     @enderror
 </div>
 
-@if(isset($proposal)) 
-<div class="mb-3">
-    <label for="status" class="form-label">Status ponude</label>
-    <select class="form-select" id="status" name="status">
-        <option value="draft" {{ old('status', $proposal->status ?? '') == 'draft' ? 'selected' : '' }}>Nacrt</option>
-        <option value="sent" {{ old('status', $proposal->status ?? '') == 'sent' ? 'selected' : '' }}>Poslano</option>
-        <option value="accepted" {{ old('status', $proposal->status ?? '') == 'accepted' ? 'selected' : '' }}>Prihvaćeno</option>
-        <option value="rejected" {{ old('status', $proposal->status ?? '') == 'rejected' ? 'selected' : '' }}>Odbijeno</option>
-    </select>
-    @error('status')
-        <div class="text-danger">{{ $message }}</div>
-    @enderror
-</div>
-@endif
-
 <h4 class="mt-4">Odaberi proizvode:</h4>
 <div id="product-selection-container">
     @if(isset($selectedProducts) && !empty($selectedProducts))

@@ -22,9 +22,13 @@ Route::get('/shop', [ProductController::class, 'shopIndex'])->name('shop.index')
 
 // PVGIS stranica sa formom
 Route::get('/pvgis', [PvgisController::class, 'index'])->name('pvgis.index');
+Route::get('/pvgis', [PvgisController::class, 'pvgisIndex'])->name('pvgis.index');
+
 
 //  PVGIS 
 Route::post('/pvgis/calculate', [PvgisController::class, 'calculate'])->name('pvgis.calculate');
+    Route::resource('products', ProductController::class);
+
 
 // Rute koje zahtijevaju autentifikaciju
 Route::middleware('auth')->group(function () {
@@ -34,7 +38,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // proizvodi (CRUD operacije)
-    Route::resource('products', ProductController::class);
 
     // zahtjevi za ponudu
     Route::resource('quote-requests', QuoteRequestController::class);

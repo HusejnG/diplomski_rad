@@ -13,25 +13,18 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <!-- Left Side Of Navbar (Navigation Links) -->
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
-                        {{ __('Dashboard') }}
-                    </a>
-                </li>
+                
                 @auth {{-- Ovi linkovi su dostupni samo prijavljenim korisnicima --}}
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}" href="{{ route('products.index') }}">
-                            {{ __('Proizvodi (Admin)') }}
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('quote-requests.*') ? 'active' : '' }}" href="{{ route('quote-requests.index') }}">
-                            {{ __('Zahtjevi za Ponudu') }}
-                        </a>
-                    </li>
+                    @if(Auth::user()->isDesigner() || Auth::user()->isAdmin() || Auth::user()->isCustomer())
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('quote-requests.*') ? 'active' : '' }}" href="{{ route('quote-requests.index') }}">
+                                {{ __('Zahtjevi za ponudu') }}
+                            </a>
+                        </li>
+                    @endif
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('proposals.*') ? 'active' : '' }}" href="{{ route('proposals.index') }}">
-                            {{ __('Upravljanje Ponudama') }}
+                            {{ __('Upravljanje ponudama') }}
                         </a>
                     </li>
                 @endauth
