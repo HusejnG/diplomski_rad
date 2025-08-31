@@ -12,6 +12,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/welcome', function () {
+    return view('welcome');
+})->name('welcome');
+
 // Dashboard ruta, dostupna prijavljenim korisnicima
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -22,12 +26,16 @@ Route::get('/shop', [ProductController::class, 'shopIndex'])->name('shop.index')
 
 // PVGIS stranica sa formom
 Route::get('/pvgis', [PvgisController::class, 'index'])->name('pvgis.index');
-Route::get('/pvgis', [PvgisController::class, 'pvgisIndex'])->name('pvgis.index');
+
 
 
 //  PVGIS 
+Route::get('/pvgis', [PvgisController::class, 'index'])->name('pvgis.index');
 Route::post('/pvgis/calculate', [PvgisController::class, 'calculate'])->name('pvgis.calculate');
-    Route::resource('products', ProductController::class);
+Route::get('/products/suggest', [PvgisController::class, 'suggestProducts']);
+
+
+Route::resource('products', ProductController::class);
 
 
 // Rute koje zahtijevaju autentifikaciju

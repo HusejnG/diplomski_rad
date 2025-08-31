@@ -70,7 +70,7 @@ class ProductController extends Controller
 
         Product::create(array_merge($validatedData, ['image_path' => $imagePath]));
 
-        return redirect()->route('products.index')->with('success', 'Proizvod uspješno dodan!');
+        return redirect()->route('shop.index')->with('success', 'Proizvod uspješno dodan!');
     }
     
     public function show(Product $product)
@@ -110,7 +110,7 @@ class ProductController extends Controller
 
         $product->update($validatedData);
 
-        return redirect()->route('products.index')->with('success', 'Proizvod uspješno ažuriran!');
+        return redirect()->route('shop.index')->with('success', 'Proizvod uspješno ažuriran!');
     }
 
     public function destroy(Product $product)
@@ -121,7 +121,7 @@ class ProductController extends Controller
 
         $product->delete();
 
-        return redirect()->route('products.index')->with('success', 'Proizvod uspješno obrisan!');
+        return redirect()->route('shop.index')->with('success', 'Proizvod uspješno obrisan!');
     }
 
     public function shopIndex(Request $request)

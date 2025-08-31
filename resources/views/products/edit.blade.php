@@ -1,9 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Izmijeni proizvod: ') }} {{ $product->name }}
-        </h2>
+        
     </x-slot>
+
+    @php
+        $action = route('products.update', $product->id);
+    @endphp
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -13,8 +15,8 @@
                         @csrf
                         @method('PUT')
                         @include('products._form')
-                        <button type="submit" class="btn btn-primary">Ažuriraj proizvod</button>
-                        <a href="{{ route('shop.index') }}" class="btn btn-secondary">Odustani</a>
+                        
+                       
                     </form>
                 </div>
             </div>

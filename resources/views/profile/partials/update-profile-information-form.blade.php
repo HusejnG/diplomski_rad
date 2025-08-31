@@ -1,11 +1,11 @@
-<section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Profile Information') }}
+<section class="p-4 sm:p-8 bg-white shadow sm:rounded-lg mb-6">
+    <header class="mb-4">
+        <h2 class="text-lg fw-bold text-dark">
+            {{ __('Informacije o profilu') }}
         </h2>
 
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __("Update your account's profile information and email address.") }}
+        <p class="mt-1 text-muted">
+            {{ __('Ažurirajte informacije o svom profilu i email adresu.') }}
         </p>
     </header>
 
@@ -13,42 +13,44 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('profile.update') }}" class="space-y-4">
         @csrf
         @method('patch')
 
         <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
-            <x-input-error class="mt-2" :messages="$errors->get('name')" />
+            <x-input-label for="name" :value="__('Ime')" />
+            <x-text-input id="name" name="name" type="text" class="form-control mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
+            <x-input-error class="mt-2 text-danger" :messages="$errors->get('name')" />
         </div>
 
         <div>
             <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
-            <x-input-error class="mt-2" :messages="$errors->get('email')" />
+            <x-text-input id="email" name="email" type="email" class="form-control mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
+            <x-input-error class="mt-2 text-danger" :messages="$errors->get('email')" />
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
-                <div>
-                    <p class="text-sm mt-2 text-gray-800">
-                        {{ __('Your email address is unverified.') }}
+                <div class="mt-2">
+                    <p class="text-sm text-dark">
+                        {{ __('Vaša email adresa nije potvrđena.') }}
 
-                        <button form="send-verification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            {{ __('Click here to re-send the verification email.') }}
+                        <button form="send-verification" class="btn-link text-primary ms-1">
+                            {{ __('Kliknite ovdje da pošaljete verifikacioni email ponovo.') }}
                         </button>
                     </p>
 
                     @if (session('status') === 'verification-link-sent')
-                        <p class="mt-2 font-medium text-sm text-green-600">
-                            {{ __('A new verification link has been sent to your email address.') }}
+                        <p class="mt-2 font-medium text-success text-sm">
+                            {{ __('Novi verifikacioni link je poslan na vašu email adresu.') }}
                         </p>
                     @endif
                 </div>
             @endif
         </div>
 
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+        <div class="d-flex align-items-center gap-2 mt-4">
+            <x-primary-button class="btn btn-success px-4 py-2">
+                {{ __('Sačuvaj') }}
+            </x-primary-button>
 
             @if (session('status') === 'profile-updated')
                 <p
@@ -56,9 +58,26 @@
                     x-show="show"
                     x-transition
                     x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600"
-                >{{ __('Saved.') }}</p>
+                    class="text-muted ms-2"
+                >
+                    {{ __('Sačuvano.') }}
+                </p>
             @endif
         </div>
     </form>
+
+    <style>
+        .btn-link {
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 0.875rem;
+            cursor: pointer;
+            color: #606C38;
+            text-decoration: underline;
+        }
+        .btn-link:hover {
+            color: #BC6C25;
+        }
+    </style>
 </section>

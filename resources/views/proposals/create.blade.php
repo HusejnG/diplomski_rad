@@ -1,9 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Kreiraj ponudu za zahtjev #') }}{{ $quoteRequest->id }}
-        </h2>
+        
     </x-slot>
+
+       @php
+        $action = route('proposals.store'); // ruta za POST request
+        @endphp
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -15,8 +17,6 @@
 
                         @include('proposals._form', ['proposal' => null, 'products' => $products, 'selectedProducts' => []])
 
-                        <button type="submit" class="btn btn-primary">Kreiraj ponudu</button>
-                        <a href="{{ route('quote-requests.show', $quoteRequest) }}" class="btn btn-secondary">Odustani</a>
                     </form>
                 </div>
             </div>
