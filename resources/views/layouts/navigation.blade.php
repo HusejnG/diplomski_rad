@@ -77,36 +77,45 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <!-- Lijevi linkovi -->
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('calculator.*') ? 'active' : '' }}"
+                       href="{{ route('calculator.index') }}">
+                        {{ __('Kalkulator isplativosti') }}
+                    </a>
+                </li>
+
                 @auth
-                    @if(Auth::user()->isDesigner() || Auth::user()->isAdmin() || Auth::user()->isCustomer())
+                    @if(Auth::user()->isCustomer())
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('quote-requests.*') ? 'active' : '' }}" 
-                               href="{{ route('quote-requests.index') }}">
-                                {{ __('Zahtjevi za ponudu') }}
+                            <a class="nav-link {{ request()->routeIs('projects.*') ? 'active' : '' }}"
+                               href="{{ route('projects.index') }}">
+                                {{ __('Moji projekti') }}
                             </a>
                         </li>
                     @endif
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('proposals.*') ? 'active' : '' }}" 
-                           href="{{ route('proposals.index') }}">
-                            {{ __('Upravljanje ponudama') }}
-                        </a>
-                    </li>
+
+                    @if(Auth::user()->isDesigner() || Auth::user()->isAdmin())
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('review.*') ? 'active' : '' }}"
+                               href="{{ route('review.index') }}">
+                                {{ __('Obrada narudžbi') }}
+                            </a>
+                        </li>
+                    @endif
+
+                    @if(Auth::user()->isAdmin())
+                        <li class="nav-item dropdown">
+                            <a id="adminDropdown" class="nav-link dropdown-toggle {{ request()->routeIs('admin.*') ? 'active' : '' }}" href="#" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                {{ __('Katalog opreme') }}
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="adminDropdown">
+                                <a class="dropdown-item" href="{{ route('admin.panels.index') }}">{{ __('Paneli') }}</a>
+                                <a class="dropdown-item" href="{{ route('admin.inverters.index') }}">{{ __('Invertori') }}</a>
+                            </div>
+                        </li>
+                    @endif
                 @endauth
-
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('shop.index') ? 'active' : '' }}" 
-                       href="{{ route('shop.index') }}">
-                        {{ __('Proizvodi') }}
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('pvgis.index') ? 'active' : '' }}" 
-                       href="{{ route('pvgis.index') }}">
-                        {{ __('PVGIS Kalkulator') }}
-                    </a>
-                </li>
             </ul>
 
             <!-- Desni linkovi -->

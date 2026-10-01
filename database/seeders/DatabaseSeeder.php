@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,11 +12,28 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->call(EquipmentSeeder::class);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Demo nalozi za sve tri uloge (korisno za odbranu/demonstraciju rada).
+        User::updateOrCreate(['email' => 'admin@solar.test'], [
+            'name' => 'Administrator',
+            'password' => bcrypt('password'),
+            'role' => 'admin',
+            'email_verified_at' => now(),
+        ]);
+
+        User::updateOrCreate(['email' => 'projektant@solar.test'], [
+            'name' => 'Amina Projektant',
+            'password' => bcrypt('password'),
+            'role' => 'designer',
+            'email_verified_at' => now(),
+        ]);
+
+        User::updateOrCreate(['email' => 'korisnik@solar.test'], [
+            'name' => 'Test Korisnik',
+            'password' => bcrypt('password'),
+            'role' => 'customer',
+            'email_verified_at' => now(),
         ]);
     }
 }

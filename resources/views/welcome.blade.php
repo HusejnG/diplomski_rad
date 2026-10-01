@@ -1,192 +1,143 @@
 <x-app-layout>
     <style>
-        /* Paleta boja: #1C7C54, #73E2A7, #DEF4C6, #1B512D, #B1CF5F */
-
-        /* Glavne boje za cijelu stranicu */
-        .primary-bg { background-color: #1B512D; } /* Tamnija zelena za pozadine */
-        .secondary-bg { background-color: #DEF4C6; } /* Vrlo svijetla zelena za kontraste */
-        .accent-color { color: #B1CF5F; } /* Maslinasta za akcente (ikone, linije) */
-        .text-dark { color: #1B512D; } /* Tekst u tamnoj boji */
-        .text-light { color: #DEF4C6; } /* Tekst u svijetloj boji */
-
-        /* Hero sekcija - kombinacija tamnih i svijetlih tonova */
         .hero-section {
-            background-color: #1B512D; /* Primarna tamna pozadina */
-            color: #DEF4C6; /* Svijetli tekst za čitljivost */
+            background-color: #1B512D;
+            color: #DEF4C6;
             position: relative;
             overflow: hidden;
         }
-
-        .hero-section::before,
-        .hero-section::after {
+        .hero-section::before, .hero-section::after {
             content: '';
             position: absolute;
             border-radius: 50%;
-            opacity: 0.2;
-            filter: blur(50px);
-            animation: pulse-morph 12s infinite ease-in-out;
+            opacity: 0.18;
+            filter: blur(60px);
         }
-        .hero-section::before {
-            top: -50px;
-            left: -50px;
-            width: 250px;
-            height: 250px;
-            background: #cde0c2ff; /* Akcentna maslinasta */
-            animation-delay: 0s;
-        }
-        .hero-section::after {
-            bottom: -70px;
-            right: -70px;
-            width: 350px;
-            height: 350px;
-            background: #73E2A7; /* Svijetla zelena */
-            animation-delay: -6s;
-        }
+        .hero-section::before { top: -60px; left: -60px; width: 280px; height: 280px; background: #B1CF5F; }
+        .hero-section::after { bottom: -80px; right: -80px; width: 380px; height: 380px; background: #73E2A7; }
 
-        @keyframes pulse-morph {
-            0% { transform: scale(0.9) translate(0, 0); }
-            25% { transform: scale(1.1) translate(20px, 20px); }
-            50% { transform: scale(1.0) translate(0, 0); }
-            75% { transform: scale(1.2) translate(-20px, -20px); }
-            100% { transform: scale(0.9) translate(0, 0); }
-        }
-
-        /* Gumbi - elegantan hover efekt */
         .btn-main {
-            background-color: #cde0c2ff;
-            border-color: #cde0c2ff;
+            background-color: #DEF4C6;
+            border-color: #DEF4C6;
             color: #1B512D;
-            transition: transform 0.3s ease, background-color 0.3s ease;
+            font-weight: 600;
+            transition: transform .2s ease, background-color .2s ease;
         }
-        .btn-main:hover {
-            background-color: #1B512D;
-            color: #DEF4C6;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        }
+        .btn-main:hover { background-color: #B1CF5F; border-color: #B1CF5F; color: #1B512D; transform: translateY(-2px); }
 
-        /* Kartice - jednostavno i čisto */
-        .feature-card {
-            border: none;
-            background-color: #cde0c2ff; /* Bijelo-zelena podloga */
-            color: #1B512D; /* Tamni tekst */
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
+        .step-card { border: none; background-color: #F4F7F2; transition: transform .2s ease, box-shadow .2s ease; height: 100%; }
+        .step-card:hover { transform: translateY(-6px); box-shadow: 0 15px 30px rgba(0,0,0,.08); }
+        .step-number {
+            width: 42px; height: 42px; border-radius: 50%;
+            background-color: #1C7C54; color: #fff; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
         }
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-        }
-        .feature-card .card-body h3 {
-            color: #1B512D;
-        }
-        .feature-card .card-body p {
-            color: #414833; /* Tamniji tekst za bolju čitljivost */
-        }
-        .feature-card .icon-box {
-            color: #B1CF5F; /* Akcentna boja za ikone */
-        }
-
-        /* Animacija */
-        .fade-in-up {
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 0.8s forwards;
-        }
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+        .stat-box { color: #1B512D; }
     </style>
 
-    <div class="container-fluid py-5">
-        <section class="hero-section py-5">
-            <div class="container py-5">
-                <div class="row align-items-center flex-md-row-reverse">
-                    <div class="col-12 col-lg-6 text-center text-lg-start mb-4 mb-lg-0 fade-in-up" style="animation-delay: 0.3s;">
-                        <img src="{{ asset('images/slikaPaneli.png') }}"
-                             alt="Kuća sa solarnim panelima"
-                             class="img-fluid rounded-4 shadow-lg">
-                    </div>
-                    <div class="col-12 col-lg-6 text-center text-lg-start fade-in-up">
-                        <h1 class="display-4 fw-bold mb-3">
-                            Solarni sistem za vašu budućnost
-                        </h1>
-                        <p class="lead mb-4 text-light">
-                            Naša platforma omogućava jednostavno i brzo planiranje solarnih elektrana. 
-                            Odaberite lokaciju, izračunajte proizvodnju i povežite se sa provjerenim kompanijama.
-                        </p>
-                        <a href="{{ route('shop.index') }}" class="btn btn-main btn-lg rounded-pill px-4 shadow-sm">
-                            Započnite odmah
+    <section class="hero-section py-5">
+        <div class="container py-5">
+            <div class="row align-items-center">
+                <div class="col-12 col-lg-6 mb-4 mb-lg-0">
+                    <h1 class="display-5 fw-bold mb-3">Isplati li se solarna elektrana na vašoj lokaciji?</h1>
+                    <p class="lead mb-4" style="color: #DEF4C6;">
+                        Označite lokaciju na mapi, odaberite tip površine (kosi ili ravni krov, zemljište, brdovit teren...),
+                        unesite dimenzije i prosječnu potrošnju - sistem automatski projektuje solarnu elektranu koristeći
+                        stvarne podatke o sunčevom zračenju (PVGIS) i izračunava period povrata investicije.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a href="{{ route('calculator.index') }}" class="btn btn-main btn-lg rounded-pill px-4 shadow-sm">
+                            <i class="bi bi-calculator me-1"></i> Izračunaj isplativost
                         </a>
+                        @guest
+                            <a href="{{ route('register') }}" class="btn btn-outline-light btn-lg rounded-pill px-4">
+                                Registruj se
+                            </a>
+                        @endguest
                     </div>
                 </div>
+                <div class="col-12 col-lg-6 text-center">
+                    <img src="{{ asset('images/slikaPaneli.png') }}" alt="Solarni paneli na kući" class="img-fluid rounded-4 shadow-lg">
+                </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <hr class="my-5" style="border-color: #294131ff;">
+    <section class="py-5">
+        <div class="container">
+            <h2 class="h1 fw-bold text-center mb-2" style="color: #1B512D;">Kako funkcioniše?</h2>
+            <p class="text-center text-muted mb-5">Od ideje do ugrađenog sistema - sve na jednom mjestu.</p>
 
-        <section class="py-5 secondary-bg">
-            <div class="container">
-                <h2 class="display-5 fw-bold text-center mb-5 fade-in-up" style="animation-delay: 0.6s; color: #1B512D;">Kako funkcioniše?</h2>
-                <div class="row row-cols-1 row-cols-md-3 g-4">
-                    <div class="col fade-in-up" style="animation-delay: 0.8s;">
-                        <a href="{{ route('quote-requests.index') }}" style="text-decoration: none; color: inherit;">
-                            <div class="card h-100 feature-card shadow-sm rounded-4">
-                                <div class="card-body text-center p-4">
-                                    <div class="icon-box mb-3" style="font-size: 3rem;">
-                                        <i class="bi bi-send accent-color"></i>
-                                    </div>
-                                    <h3 class="h5 fw-semibold mb-3">1. Pošaljite zahtjev</h3>
-                                    <p class="text-muted">
-                                        Unesite osnovne informacije o vašim potrebama za energijom i lokaciji.
-                                    </p>
-                                </div>
-                            </div>
-                        </a>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+                <div class="col">
+                    <div class="card step-card shadow-sm rounded-4 p-3">
+                        <div class="card-body">
+                            <div class="step-number mb-3">1</div>
+                            <h3 class="h6 fw-bold">Lokacija i površina</h3>
+                            <p class="text-muted small mb-0">Označite lokaciju na mapi ili je pretražite, odaberite tip površine (krov, zemljište...) i unesite njene dimenzije.</p>
+                        </div>
                     </div>
-
-                    <div class="col fade-in-up" style="animation-delay: 1s;">
-                        <a href="{{ route('proposals.index') }}" class="text-decoration-none">
-                            <div class="card h-100 feature-card shadow-sm rounded-4">
-                                <div class="card-body text-center p-4">
-                                    <div class="icon-box mb-3" style="font-size: 3rem;">
-                                        <i class="bi bi-lightbulb accent-color"></i>
-                                    </div>
-                                    <h3 class="h5 fw-semibold mb-3">2. Dizajner kreira ponudu</h3>
-                                    <p class="text-muted">
-                                        Naši stručnjaci će dizajnirati sistem koristeći najbolje komponente.
-                                    </p>
-                                </div>
-                            </div>
-                        </a>
+                </div>
+                <div class="col">
+                    <div class="card step-card shadow-sm rounded-4 p-3">
+                        <div class="card-body">
+                            <div class="step-number mb-3">2</div>
+                            <h3 class="h6 fw-bold">Automatsko projektovanje</h3>
+                            <p class="text-muted small mb-0">Sistem bira odgovarajuće panele i invertor iz kataloga i izračunava godišnju proizvodnju energije preko PVGIS servisa.</p>
+                        </div>
                     </div>
-
-                    <div class="col fade-in-up" style="animation-delay: 1.2s;">
-                        <div class="card h-100 feature-card shadow-sm rounded-4">
-                            <div class="card-body text-center p-4">
-                                <div class="icon-box mb-3" style="font-size: 3rem;">
-                                    <i class="bi bi-patch-check accent-color"></i>
-                                </div>
-                                <h3 class="h5 fw-semibold mb-3">3. Prihvatite i realizujte</h3>
-                                <p class="text-muted">
-                                    Pregledajte ponudu, prihvatite je i započnite instalaciju.
-                                </p>
-                            </div>
+                </div>
+                <div class="col">
+                    <div class="card step-card shadow-sm rounded-4 p-3">
+                        <div class="card-body">
+                            <div class="step-number mb-3">3</div>
+                            <h3 class="h6 fw-bold">Isplativost i povrat investicije</h3>
+                            <p class="text-muted small mb-0">Dobijate procjenu investicije, godišnje uštede, period povrata i projekciju za narednih 25 godina.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card step-card shadow-sm rounded-4 p-3">
+                        <div class="card-body">
+                            <div class="step-number mb-3">4</div>
+                            <h3 class="h6 fw-bold">Narudžba i ugradnja</h3>
+                            <p class="text-muted small mb-0">Jednim klikom pošaljete narudžbu - projektant pregleda i odobrava prijedlog, te zakazuje ugradnju.</p>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
-        
-        <hr class="my-5" style="border-color: #1B512D;">
+        </div>
+    </section>
 
-        <footer class="text-light py-4 text-center primary-bg">
-            <div class="container">
-                <p class="mb-0">&copy; {{ date('Y') }} {{ config('app.name', 'Solarni Sistem') }}. Sva prava zadržana.</p>
+    <section class="py-5" style="background-color: #DEF4C6;">
+        <div class="container">
+            <div class="row text-center g-4 stat-box">
+                <div class="col-6 col-md-3">
+                    <div class="display-6 fw-bold">PVGIS</div>
+                    <div class="small text-muted">Zvanični podaci EU o sunčevom zračenju</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="display-6 fw-bold">25 god.</div>
+                    <div class="small text-muted">Horizont finansijske projekcije</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="display-6 fw-bold">6 tipova</div>
+                    <div class="small text-muted">Podržanih površina za ugradnju</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="display-6 fw-bold">1 klik</div>
+                    <div class="small text-muted">Za slanje narudžbe projektantu</div>
+                </div>
             </div>
-        </footer>
-    </div>
+        </div>
+    </section>
+
+    <section class="py-5 text-center">
+        <div class="container">
+            <h2 class="h3 fw-bold mb-3" style="color: #1B512D;">Spremni da provjerite svoju lokaciju?</h2>
+            <a href="{{ route('calculator.index') }}" class="btn btn-primary btn-lg rounded-pill px-5">
+                Pokreni kalkulator
+            </a>
+        </div>
+    </section>
 </x-app-layout>

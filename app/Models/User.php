@@ -26,7 +26,7 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    
+
     protected function casts(): array
     {
         return [
@@ -35,30 +35,28 @@ class User extends Authenticatable
         ];
     }
 
-     
-
-    public function quoteRequests()
+    /**
+     * Solarni projekti koje je korisnik sam kreirao (uloga: korisnik/kupac).
+     */
+    public function solarProjects()
     {
-        return $this->hasMany(QuoteRequest::class);
+        return $this->hasMany(SolarProject::class, 'user_id');
     }
 
-    public function createdProposals() 
+    /**
+     * Projekti koje je ovaj projektant preuzeo na obradu (uloga: projektant).
+     */
+    public function assignedSolarProjects()
     {
-        return $this->hasMany(Proposal::class, 'designer_id');
+        return $this->hasMany(SolarProject::class, 'designer_id');
     }
-
-    public function receivedProposals()
-    {
-        return $this->hasManyThrough(Proposal::class, QuoteRequest::class, 'user_id', 'quote_request_id');
-    }
-
 
     public function isAdmin()
     {
         return $this->role === 'admin';
     }
 
-     public function isDesigner()
+    public function isDesigner()
     {
         return $this->role === 'designer';
     }
