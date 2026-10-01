@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CalculateSolarProjectRequest;
 use App\Models\SolarProject;
 use App\Services\ProjectCalculationService;
+use DomainException;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -56,15 +57,15 @@ class SolarProjectController extends Controller
 
     public function show(SolarProject $project)
     {
-        $this->authorizeAccess($project);
-        $project->load(['panel', 'inverter', 'designer']);
+        $this->authorizeView($project);
+        $project->load(['panel', 'inverter', 'designer', 'statusChanges.user']);
 
         return view('projects.show', compact('project'));
     }
 
     public function edit(SolarProject $project)
     {
-        $this->authorizeAccess($project);
+        $this->authorizeOwner($project);
 
         if (! $project->isEditableByCustomer()) {
             return redirect()->route('projects.show', $project)
@@ -79,7 +80,7 @@ class SolarProjectController extends Controller
 
     public function update(CalculateSolarProjectRequest $request, SolarProject $project, ProjectCalculationService $calculationService)
     {
-        $this->authorizeAccess($project);
+        $this->authorizeOwner($project);
 
         if (! $project->isEditableByCustomer()) {
             abort(403);
@@ -111,16 +112,13 @@ class SolarProjectController extends Controller
      */
     public function submit(SolarProject $project)
     {
-        $this->authorizeAccess($project);
+        $this->authorizeOwner($project);
 
-        if ($project->status !== SolarProject::STATUS_CALCULATED) {
+        try {
+            $project->transitionTo(SolarProject::STATUS_SUBMITTED, ['submitted_at' => now()]);
+        } catch (DomainException $e) {
             return back()->with('error', 'Narudžba se može poslati samo za izračunat, još neposlan projekat.');
         }
-
-        $project->update([
-            'status' => SolarProject::STATUS_SUBMITTED,
-            'submitted_at' => now(),
-        ]);
 
         return redirect()->route('projects.show', $project)
             ->with('success', 'Narudžba je poslana! Projektant će uskoro pregledati i potvrditi vaš sistem.');
@@ -128,7 +126,7 @@ class SolarProjectController extends Controller
 
     public function destroy(SolarProject $project)
     {
-        $this->authorizeAccess($project);
+        $this->authorizeOwner($project);
 
         if (! $project->isEditableByCustomer()) {
             return back()->with('error', 'Poslana narudžba se ne može obrisati - kontaktirajte projektanta.');
@@ -139,22 +137,36 @@ class SolarProjectController extends Controller
         return redirect()->route('projects.index')->with('success', 'Projekat je obrisan.');
     }
 
-    private function authorizeAccess(SolarProject $project): void
+    /**
+     * Pregled: vlasnik, admin, projektant kojem je projekat dodijeljen i
+     * projektant koji gleda nepreuzetu narudžbu.
+     */
+    private function authorizeView(SolarProject $project): void
     {
         $user = Auth::user();
 
-        if ($user->isAdmin()) {
+        if ($project->user_id === $user->id || $user->isAdmin()) {
             return;
         }
 
-        if ($user->isDesigner() && ($project->designer_id === $user->id || $project->designer_id === null)) {
-            return;
-        }
-
-        if ($project->user_id === $user->id) {
+        if ($user->isDesigner() && (
+            $project->designer_id === $user->id
+            || ($project->designer_id === null && $project->status === SolarProject::STATUS_SUBMITTED)
+        )) {
             return;
         }
 
         abort(403);
+    }
+
+    /**
+     * Izmjena, brisanje i slanje narudžbe: samo vlasnik projekta. Projektant
+     * i admin mijenjaju projekat kroz svoj radni prostor (ProjectReviewController).
+     */
+    private function authorizeOwner(SolarProject $project): void
+    {
+        if ($project->user_id !== Auth::id()) {
+            abort(403);
+        }
     }
 }

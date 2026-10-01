@@ -105,6 +105,8 @@
                     </div>
                 </div>
 
+                <x-status-timeline :project="$project" />
+
                 @if($project->isEditableByCustomer())
                     <div class="d-grid gap-2">
                         <form method="POST" action="{{ route('projects.submit', $project) }}">

@@ -7,6 +7,7 @@ use App\Models\Panel;
 use App\Models\SolarProject;
 use App\Services\FinancialCalculationService;
 use App\Services\SystemDesignService;
+use DomainException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -50,8 +51,8 @@ class ProjectReviewController extends Controller
 
     public function show(SolarProject $project)
     {
-        $this->authorizeReviewer($project);
-        $project->load(['panel', 'inverter', 'user']);
+        $this->authorizeReviewer($project, allowUnclaimedSubmission: true);
+        $project->load(['panel', 'inverter', 'user', 'statusChanges.user']);
 
         return view('review.show', [
             'project' => $project,
@@ -66,9 +67,8 @@ class ProjectReviewController extends Controller
             return back()->with('error', 'Ovaj zahtjev je već preuzet.');
         }
 
-        $project->update([
+        $project->transitionTo(SolarProject::STATUS_UNDER_REVIEW, [
             'designer_id' => Auth::id(),
-            'status' => SolarProject::STATUS_UNDER_REVIEW,
             'reviewed_at' => now(),
         ]);
 
@@ -87,6 +87,10 @@ class ProjectReviewController extends Controller
         FinancialCalculationService $financialService,
     ) {
         $this->authorizeReviewer($project);
+
+        if ($project->status !== SolarProject::STATUS_UNDER_REVIEW) {
+            return back()->with('error', 'Sistem se može prilagoditi samo dok je projekat u obradi (prije odobravanja).');
+        }
 
         $data = $request->validate([
             'panel_id' => ['required', 'exists:panels,id'],
@@ -153,10 +157,13 @@ class ProjectReviewController extends Controller
     {
         $this->authorizeReviewer($project);
 
-        $project->update([
-            'status' => SolarProject::STATUS_APPROVED,
-            'designer_notes' => $request->input('designer_notes', $project->designer_notes),
-        ]);
+        try {
+            $project->transitionTo(SolarProject::STATUS_APPROVED, [
+                'designer_notes' => $request->input('designer_notes', $project->designer_notes),
+            ], note: $request->input('designer_notes'));
+        } catch (DomainException $e) {
+            return back()->with('error', $e->getMessage());
+        }
 
         return redirect()->route('review.show', $project)->with('success', 'Projekat je odobren.');
     }
@@ -167,10 +174,13 @@ class ProjectReviewController extends Controller
 
         $request->validate(['reason' => ['required', 'string', 'max:2000']]);
 
-        $project->update([
-            'status' => SolarProject::STATUS_REJECTED,
-            'designer_notes' => $request->input('reason'),
-        ]);
+        try {
+            $project->transitionTo(SolarProject::STATUS_REJECTED, [
+                'designer_notes' => $request->input('reason'),
+            ], note: $request->input('reason'));
+        } catch (DomainException $e) {
+            return back()->with('error', $e->getMessage());
+        }
 
         return redirect()->route('review.index')->with('success', 'Zahtjev je odbijen.');
     }
@@ -181,27 +191,38 @@ class ProjectReviewController extends Controller
 
         $request->validate(['installation_scheduled_at' => ['required', 'date', 'after_or_equal:today']]);
 
-        $project->update([
-            'status' => SolarProject::STATUS_SCHEDULED,
-            'installation_scheduled_at' => $request->input('installation_scheduled_at'),
-        ]);
+        try {
+            $project->transitionTo(SolarProject::STATUS_SCHEDULED, [
+                'installation_scheduled_at' => $request->input('installation_scheduled_at'),
+            ]);
+        } catch (DomainException $e) {
+            return back()->with('error', $e->getMessage());
+        }
 
-        return redirect()->route('review.show', $project)->with('success', 'Ugradnja je zakazana - ekipa za instalaciju je obaviještena.');
+        return redirect()->route('review.show', $project)->with('success', 'Ugradnja je zakazana i kupac je obaviješten emailom.');
     }
 
     public function complete(SolarProject $project)
     {
         $this->authorizeReviewer($project);
 
-        $project->update([
-            'status' => SolarProject::STATUS_COMPLETED,
-            'completed_at' => now(),
-        ]);
+        try {
+            $project->transitionTo(SolarProject::STATUS_COMPLETED, [
+                'completed_at' => now(),
+            ]);
+        } catch (DomainException $e) {
+            return back()->with('error', $e->getMessage());
+        }
 
         return redirect()->route('review.index')->with('success', 'Projekat je označen kao završen.');
     }
 
-    private function authorizeReviewer(SolarProject $project): void
+    /**
+     * Admin smije sve. Projektant radi samo na projektima koje je sam preuzeo;
+     * nepreuzetu narudžbu iz reda čekanja smije samo pogledati (da bi odlučio
+     * hoće li je preuzeti).
+     */
+    private function authorizeReviewer(SolarProject $project, bool $allowUnclaimedSubmission = false): void
     {
         $user = Auth::user();
 
@@ -209,7 +230,17 @@ class ProjectReviewController extends Controller
             return;
         }
 
-        if ($user->isDesigner() && ($project->designer_id === null || $project->designer_id === $user->id)) {
+        if (! $user->isDesigner()) {
+            abort(403);
+        }
+
+        if ($project->designer_id === $user->id) {
+            return;
+        }
+
+        if ($allowUnclaimedSubmission
+            && $project->designer_id === null
+            && $project->status === SolarProject::STATUS_SUBMITTED) {
             return;
         }
 

@@ -100,6 +100,8 @@
                     </div>
                 </div>
 
+                <x-status-timeline :project="$project" />
+
                 <div class="card rounded-4 shadow-sm">
                     <div class="card-body p-4">
                         <h3 class="h6 fw-bold mb-3">Radnje</h3>

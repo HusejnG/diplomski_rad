@@ -2,8 +2,12 @@
 
 namespace App\Models;
 
+use App\Notifications\ProjectStatusChanged;
+use DomainException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Centralni entitet aplikacije: jedan solarni projekat.
@@ -35,6 +39,29 @@ class SolarProject extends Model
         self::STATUS_SCHEDULED => 'Ugradnja zakazana',
         self::STATUS_COMPLETED => 'Završeno',
         self::STATUS_REJECTED => 'Odbijeno',
+    ];
+
+    // Dozvoljeni prelazi između statusa. Sve ostalo se odbija - npr. odobravanje
+    // projekta koji niko nije preuzeo, zakazivanje neodobrenog projekta ili
+    // ponovno otvaranje završenog ili odbijenog.
+    public const TRANSITIONS = [
+        self::STATUS_DRAFT => [self::STATUS_CALCULATED],
+        self::STATUS_CALCULATED => [self::STATUS_SUBMITTED],
+        self::STATUS_SUBMITTED => [self::STATUS_UNDER_REVIEW],
+        self::STATUS_UNDER_REVIEW => [self::STATUS_APPROVED, self::STATUS_REJECTED],
+        self::STATUS_APPROVED => [self::STATUS_SCHEDULED, self::STATUS_REJECTED],
+        self::STATUS_SCHEDULED => [self::STATUS_COMPLETED, self::STATUS_REJECTED],
+        self::STATUS_COMPLETED => [],
+        self::STATUS_REJECTED => [],
+    ];
+
+    // Statusi o kojima kupac dobija email (ostale promjene pravi sam).
+    public const NOTIFY_CUSTOMER_ON = [
+        self::STATUS_UNDER_REVIEW,
+        self::STATUS_APPROVED,
+        self::STATUS_REJECTED,
+        self::STATUS_SCHEDULED,
+        self::STATUS_COMPLETED,
     ];
 
     public const SURFACE_TYPES = [
@@ -131,6 +158,8 @@ class SolarProject extends Model
     protected function casts(): array
     {
         return [
+            'user_id' => 'integer',
+            'designer_id' => 'integer',
             'monthly_production' => 'array',
             'cashflow_25y' => 'array',
             'installation_scheduled_at' => 'date',
@@ -140,9 +169,26 @@ class SolarProject extends Model
         ];
     }
 
+    protected static function booted(): void
+    {
+        // Prvi zapis u historiji: status u kojem je projekat nastao.
+        static::created(function (SolarProject $project) {
+            $project->statusChanges()->create([
+                'from_status' => null,
+                'to_status' => $project->status,
+                'user_id' => Auth::id(),
+            ]);
+        });
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function statusChanges()
+    {
+        return $this->hasMany(ProjectStatusChange::class)->oldest()->oldest('id');
     }
 
     public function designer()
@@ -173,5 +219,47 @@ class SolarProject extends Model
     public function isEditableByCustomer(): bool
     {
         return in_array($this->status, [self::STATUS_DRAFT, self::STATUS_CALCULATED], true);
+    }
+
+    public function canTransitionTo(string $status): bool
+    {
+        return in_array($status, self::TRANSITIONS[$this->status] ?? [], true);
+    }
+
+    /**
+     * Prevodi projekat u novi status (uz dodatne atribute, npr. datum
+     * ugradnje), zapisuje prelaz u historiju i po potrebi šalje email
+     * kupcu. Baca izuzetak ako taj prelaz nije dozvoljen.
+     *
+     * @throws DomainException
+     */
+    public function transitionTo(string $status, array $attributes = [], ?string $note = null): ProjectStatusChange
+    {
+        if (! $this->canTransitionTo($status)) {
+            throw new DomainException(sprintf(
+                'Projekat sa statusom "%s" ne može preći u status "%s".',
+                $this->status_label,
+                self::STATUS_LABELS[$status] ?? $status,
+            ));
+        }
+
+        $from = $this->status;
+
+        $change = DB::transaction(function () use ($status, $attributes, $note, $from) {
+            $this->update(array_merge($attributes, ['status' => $status]));
+
+            return $this->statusChanges()->create([
+                'from_status' => $from,
+                'to_status' => $status,
+                'user_id' => Auth::id(),
+                'note' => $note,
+            ]);
+        });
+
+        if (in_array($status, self::NOTIFY_CUSTOMER_ON, true) && $this->user) {
+            $this->user->notify(new ProjectStatusChanged($this, $change));
+        }
+
+        return $change;
     }
 }
