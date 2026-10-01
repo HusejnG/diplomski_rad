@@ -1,4 +1,93 @@
-# Solarko - sistem za projektovanje i procjenu isplativosti solarnih elektrana
+# Solarko: solar system design and payback calculator
+
+[![Tests](https://github.com/HusejnG/diplomski_rad/actions/workflows/tests.yml/badge.svg)](https://github.com/HusejnG/diplomski_rad/actions/workflows/tests.yml)
+
+A Laravel web application for designing small photovoltaic systems and
+estimating whether they pay off. It grew out of my bachelor thesis
+(B.Sc. Software Engineering, University of Zenica, 2025); this is the
+redesigned version. The user interface is in Bosnian.
+
+## What it does
+
+1. **Location and surface.** The user marks a location on a map (or
+   searches for it), picks the kind of surface (pitched roof, flat roof,
+   building roof, flat or hilly ground) and enters the available area and
+   the average monthly electricity consumption.
+2. **Automatic system design.** `SystemDesignService` works out the
+   usable area for that surface type, picks a panel and an inverter from
+   the equipment catalogue, and sizes the system so it fits the area and
+   roughly matches the consumption without oversizing.
+3. **Energy production.** `PvgisService` calls the European Commission's
+   PVGIS API (v5.2) with the exact location, power, tilt and orientation
+   and returns the monthly and yearly production; shading is applied as
+   an extra loss.
+4. **Payback.** `FinancialCalculationService` models 25 years of cash
+   flow: panel degradation, rising electricity prices, self-consumed vs.
+   exported energy, maintenance and one inverter replacement. It returns
+   the simple payback period and the NPV.
+5. **Order workflow.** A logged-in customer saves the calculation as a
+   project and submits it with one click. A designer claims it, can
+   adjust the equipment (everything is recalculated), approves or rejects
+   it, schedules the installation and marks it completed. Admins also
+   manage the equipment catalogue.
+
+The workflow is enforced in one place: `SolarProject::TRANSITIONS` lists
+the allowed status changes, and every change goes through
+`transitionTo()`, which records it in the status history (shown as a
+timeline to the customer and the designer) and emails the customer.
+
+```
+calculated → submitted → under_review → approved → scheduled → completed
+                               └────────────┴──────────┴──→ rejected
+```
+
+## Tech stack
+
+Laravel 12 (PHP 8.2+), SQLite by default (MySQL via `.env`), Blade,
+Bootstrap 5 and Vite, Leaflet.js with OpenStreetMap/Nominatim for the
+map, Chart.js for production and cash-flow charts, PVGIS API v5.2.
+
+## Running locally
+
+```bash
+composer install
+npm install && npm run build
+
+cp .env.example .env
+php artisan key:generate
+touch database/database.sqlite
+
+php artisan migrate --seed
+php artisan serve
+```
+
+Demo accounts created by the seeder (password `password` for all):
+`admin@solar.test`, `projektant@solar.test` (designer),
+`korisnik@solar.test` (customer). Emails go to the log
+(`MAIL_MAILER=log`), so they show up in `storage/logs/laravel.log`.
+
+## Tests
+
+```bash
+php artisan test
+```
+
+62 tests: the calculator and its validation, the order workflow and
+who may perform which step, status history and customer emails, the
+automatic system design, and the financial model. PVGIS is faked with
+`Http::fake()`, so the tests don't depend on the external service.
+GitHub Actions runs them on every push.
+
+## Assumptions in the financial model
+
+Constants in `FinancialCalculationService`: 25-year horizon, 0.5 %
+panel degradation per year, 2 % yearly electricity price increase,
+exported energy paid at 50 % of the retail price, 120 BAM yearly
+maintenance, 5 % discount rate for NPV, one inverter replacement when
+its warranty ends. The equipment catalogue is seeded with representative
+models and prices in BAM and is maintained by the admin.
+
+## Opis na bosanskom: Solarko - sistem za projektovanje i procjenu isplativosti solarnih elektrana
 
 Web aplikacija za samostalno projektovanje malih fotonaponskih (solarnih) sistema i procjenu
 njihove finansijske isplativosti, sa mogućnošću slanja narudžbe projektantu na odobrenje.
@@ -9,7 +98,7 @@ proizvoda). Ova verzija vraća fokus na prvobitnu ideju - **automatizovano proje
 proračun povrata investicije** - uz zadržavanje toka narudžbe i odobravanja koji je bio dio ideje
 za informacioni sistem (korisnik naruči jednim klikom, projektant pregleda/odobri/zakaže ugradnju).
 
-## Kako aplikacija radi
+### Kako aplikacija radi
 
 1. **Lokacija i površina** - korisnik označi lokaciju na mapi (ili je pretraži), odabere tip
    površine (kosi krov, ravni krov kuće, ravni krov zgrade, ravno zemljište, brdovit teren,
@@ -32,9 +121,11 @@ za informacioni sistem (korisnik naruči jednim klikom, projektant pregleda/odob
 
 Cijeli životni ciklus jednog projekta je jedan model, `App\Models\SolarProject`, sa statusima:
 `draft → calculated → submitted → under_review → approved → scheduled → completed` (ili
-`rejected` u bilo kojem trenutku prije `completed`).
+`rejected` nakon što projektant preuzme narudžbu, a prije `completed`). Dozvoljeni prelazi su
+definisani u `SolarProject::TRANSITIONS`; svaki prelaz se zapisuje u historiju statusa, a kupac
+dobija email kada projektant preuzme, odobri, odbije, zakaže ili završi projekat.
 
-## Katalog opreme
+### Katalog opreme
 
 Ne postoji jedan pouzdan besplatan javni API koji vraća ažurne maloprodajne cijene i specifikacije
 solarnih panela/invertora za tržište BiH, pa je `database/seeders/EquipmentSeeder.php` popunjen
@@ -43,7 +134,7 @@ SolarEdge, Deye...) i orijentacionim cijenama u BAM. Administrator kasnije uređ
 `/admin/panels` i `/admin/inverters` kako bi cijene bile ažurne - to je namjerna arhitektonska
 odluka, ne propust.
 
-## Uloge
+### Uloge
 
 - **Korisnik (customer)** - pravi proračune, šalje narudžbe, prati status svojih projekata.
 - **Projektant (designer)** - obrađuje pristigle narudžbe (`/projektant`), prilagođava sistem,
@@ -51,7 +142,7 @@ odluka, ne propust.
 - **Administrator (admin)** - sve što i projektant, plus upravljanje katalogom opreme
   (`/admin/panels`, `/admin/inverters`).
 
-## Tehnologije
+### Tehnologije
 
 - Backend: Laravel 12 (PHP 8.4)
 - Baza podataka: SQLite podrazumijevano za razvoj (lako se prebaci na MySQL u `.env`)
@@ -60,7 +151,7 @@ odluka, ne propust.
   Nominatim/OpenStreetMap (pretraga lokacije)
 - Eksterni API: PVGIS v5.2 (Evropska komisija) za podatke o sunčevom zračenju i proizvodnji
 
-## Pokretanje
+### Pokretanje
 
 ```bash
 composer install
@@ -82,19 +173,23 @@ Seeder kreira demo naloge (lozinka za sve: `password`):
 | Projektant | projektant@solar.test     |
 | Korisnik   | korisnik@solar.test       |
 
-## Testovi
+### Testovi
 
 ```bash
 php artisan test
 ```
 
-`tests/Feature/SolarCalculationTest.php` pokriva cijeli tok: javni proračun, validaciju granica
-površine, snimanje projekta i slanje narudžbe od strane korisnika, preuzimanje/odobravanje/
-zakazivanje od strane projektanta i autorizaciju (korisnik ne može vidjeti tuđi projekat). PVGIS
-poziv je mokovan (`Http::fake()`) jer testno okruženje ne treba zavisiti od dostupnosti eksternog
-servisa.
+- `tests/Feature/SolarCalculationTest.php` - javni proračun, validacija, snimanje projekta i
+  slanje narudžbe, ručno unesena samopotrošnja.
+- `tests/Feature/ProjectWorkflowTest.php` - redoslijed statusa, ko smije koji korak, historija
+  statusa i email obavještenja kupcu.
+- `tests/Feature/SystemDesignServiceTest.php` i `tests/Unit/FinancialCalculationServiceTest.php` -
+  automatsko projektovanje sistema i finansijski model.
 
-## Napomena o proračunu isplativosti
+PVGIS poziv je mokovan (`Http::fake()`) jer testovi ne treba da zavise od dostupnosti eksternog
+servisa. GitHub Actions pokreće sve testove na svaki push.
+
+### Napomena o proračunu isplativosti
 
 Finansijski model (`FinancialCalculationService`) koristi sljedeće pretpostavke, koje su
 dokumentovane kao konstante u kodu i mogu se lako izmijeniti:
@@ -108,5 +203,5 @@ dokumentovane kao konstante u kodu i mogu se lako izmijeniti:
 - zamjena invertora jednokratno nakon isteka njegove garancije
 
 Udio samopotrošnje (koliko se proizvedene energije odmah potroši u domaćinstvu, a koliko se
-predaje u mrežu) korisnik može ručno unijeti, ili ostaviti sistemu da ga procijeni na osnovu
-odnosa veličine sistema i potrošnje.
+predaje u mrežu) korisnik može ručno unijeti u naprednim postavkama, ili ostaviti prazno da ga
+sistem procijeni na osnovu odnosa veličine sistema i potrošnje.
