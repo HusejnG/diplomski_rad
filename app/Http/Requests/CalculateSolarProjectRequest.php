@@ -27,6 +27,9 @@ class CalculateSolarProjectRequest extends FormRequest
             'shading' => ['nullable', Rule::in(array_keys(SolarProject::SHADING_LOSS))],
             'avg_monthly_consumption_kwh' => ['required', 'numeric', 'min:1', 'max:100000'],
             'electricity_price_bam_kwh' => ['nullable', 'numeric', 'min:0.01', 'max:2'],
+            // Udio proizvodnje koji se odmah troši u domaćinstvu. Ako ga
+            // korisnik ne unese, procjenjuje ga ProjectCalculationService.
+            'self_consumption_percent' => ['nullable', 'numeric', 'between:0,100'],
         ];
     }
 

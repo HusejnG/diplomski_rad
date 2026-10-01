@@ -113,17 +113,22 @@
                                 </a>
                                 <div class="collapse mt-3" id="advancedSettings">
                                     <div class="row g-3">
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Nagib panela (°)</label>
                                             <input type="number" step="1" min="0" max="90" id="tilt_deg" name="tilt_deg" class="form-control" value="{{ old('tilt_deg', $project->tilt_deg ?? '') }}" placeholder="auto">
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Orijentacija (0=jug)</label>
                                             <input type="number" step="1" min="-180" max="180" id="azimuth_deg" name="azimuth_deg" class="form-control" value="{{ old('azimuth_deg', $project->azimuth_deg ?? 0) }}">
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Cijena struje (BAM/kWh)</label>
                                             <input type="number" step="0.001" min="0.01" id="electricity_price_bam_kwh" name="electricity_price_bam_kwh" class="form-control" value="{{ old('electricity_price_bam_kwh', $project->electricity_price_bam_kwh ?? 0.180) }}">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Samopotrošnja (%)</label>
+                                            <input type="number" step="1" min="0" max="100" id="self_consumption_percent" name="self_consumption_percent" class="form-control" value="{{ old('self_consumption_percent') }}" placeholder="auto">
+                                            <div class="form-text">Prazno = procjena na osnovu veličine sistema i potrošnje.</div>
                                         </div>
                                     </div>
                                 </div>

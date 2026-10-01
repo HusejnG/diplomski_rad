@@ -71,6 +71,43 @@ class SolarCalculationTest extends TestCase
         $this->assertCount(25, $response->json('financials.cashflow'));
     }
 
+    public function test_self_consumption_entered_by_the_user_is_used_instead_of_the_estimate(): void
+    {
+        $this->fakePvgis();
+        $this->seedEquipment();
+
+        $input = [
+            'latitude' => 43.8563,
+            'longitude' => 18.4131,
+            'surface_type' => 'kosi_krov',
+            'available_area_sqm' => 40,
+            'avg_monthly_consumption_kwh' => 350,
+        ];
+
+        $estimated = $this->postJson(route('calculator.calculate'), $input)->assertOk();
+        $manual = $this->postJson(route('calculator.calculate'), $input + ['self_consumption_percent' => 100])->assertOk();
+
+        $this->assertNotEquals(100, $estimated->json('financials.self_consumption_percent'));
+        $this->assertEquals(100, $manual->json('financials.self_consumption_percent'));
+        // Sva proizvodnja po punoj cijeni struje daje veću uštedu od procjene sa predajom viška u mrežu.
+        $this->assertGreaterThan(
+            $estimated->json('financials.annual_savings_year1_bam'),
+            $manual->json('financials.annual_savings_year1_bam'),
+        );
+    }
+
+    public function test_self_consumption_outside_0_to_100_percent_is_rejected(): void
+    {
+        $this->postJson(route('calculator.calculate'), [
+            'latitude' => 43.8563,
+            'longitude' => 18.4131,
+            'surface_type' => 'kosi_krov',
+            'available_area_sqm' => 40,
+            'avg_monthly_consumption_kwh' => 350,
+            'self_consumption_percent' => 120,
+        ])->assertStatus(422)->assertJsonValidationErrors('self_consumption_percent');
+    }
+
     public function test_calculator_rejects_a_surface_too_small_for_a_single_panel(): void
     {
         $this->fakePvgis();
